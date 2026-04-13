@@ -72,13 +72,13 @@ export default function LoginPage() {
           {!isLogin && (
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-300 ml-1">Full Name</label>
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+              <div className="glass-input-group relative">
+                <User className="icon-left" size={18} />
                 <input
                   required
                   type="text"
                   placeholder="John Doe"
-                  className="input-field pl-12"
+                  className="input-field input-with-icon"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
@@ -88,13 +88,13 @@ export default function LoginPage() {
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-slate-300 ml-1">Email Address</label>
-            <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+            <div className="glass-input-group relative">
+              <Mail className="icon-left" size={18} />
               <input
                 required
                 type="email"
                 placeholder="name@college.edu"
-                className="input-field pl-12"
+                className="input-field input-with-icon"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
@@ -103,13 +103,13 @@ export default function LoginPage() {
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-slate-300 ml-1">Password</label>
-            <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+            <div className="glass-input-group relative">
+              <Lock className="icon-left" size={18} />
               <input
                 required
                 type="password"
                 placeholder="••••••••"
-                className="input-field pl-12"
+                className="input-field input-with-icon"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               />

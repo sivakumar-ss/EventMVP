@@ -65,12 +65,12 @@ export default function BrowseEvents() {
 
           {/* Controls */}
           <div className="glass p-4 rounded-2xl mb-10 flex flex-col md:flex-row gap-4 items-center">
-            <div className="relative flex-1 w-full">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+            <div className="glass-input-group relative flex-1 w-full">
+              <Search className="icon-left" size={18} />
               <input
                 type="text"
                 placeholder="Search events by title..."
-                className="input-field pl-12"
+                className="input-field input-with-icon"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />

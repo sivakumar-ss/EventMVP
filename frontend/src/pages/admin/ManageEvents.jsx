@@ -56,12 +56,12 @@ export default function ManageEvents() {
             </a>
           </header>
 
-          <div className="relative mb-8 max-w-md">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+          <div className="glass-input-group relative mb-8 max-w-md">
+            <Search className="icon-left" size={18} />
             <input
               type="text"
               placeholder="Search by event title..."
-              className="input-field pl-12"
+              className="input-field input-with-icon"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />

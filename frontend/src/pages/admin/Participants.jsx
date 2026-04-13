@@ -66,12 +66,12 @@ export default function Participants() {
 
           <div className="glass rounded-3xl border border-white/5 overflow-hidden">
             <div className="p-6 border-b border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-                <div className="relative w-full md:w-96">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+                <div className="glass-input-group relative w-full md:w-96">
+                    <Search className="icon-left" size={18} />
                     <input
                         type="text"
                         placeholder="Search student by name or email..."
-                        className="input-field pl-12"
+                        className="input-field input-with-icon"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />

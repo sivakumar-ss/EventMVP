@@ -65,7 +65,19 @@
   }
 
   .input-field {
-    @apply w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200;
+    @apply w-full bg-white/10 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-white/20 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-300;
+  }
+
+  .input-with-icon {
+    @apply pl-12!;
+  }
+
+  .icon-left {
+    @apply absolute left-4.5 top-1/2 -translate-y-1/2 text-slate-500 transition-colors duration-300 pointer-events-none;
+  }
+
+  .glass-input-group:focus-within .icon-left {
+    @apply text-indigo-400;
   }
 
   .sidebar-link {

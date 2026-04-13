@@ -75,11 +75,11 @@ export default function StudentProfile() {
                         <div className="grid sm:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-slate-400 ml-1">Full Name</label>
-                                <div className="relative">
-                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+                                <div className="glass-input-group relative">
+                                    <User className="icon-left" size={18} />
                                     <input 
                                         type="text" 
-                                        className="input-field pl-12" 
+                                        className="input-field input-with-icon" 
                                         value={profile.name}
                                         onChange={e => setProfile({...profile, name: e.target.value})}
                                     />
@@ -87,11 +87,11 @@ export default function StudentProfile() {
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-slate-400 ml-1">Email Address</label>
-                                <div className="relative">
-                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+                                <div className="glass-input-group relative">
+                                    <Mail className="icon-left" size={18} />
                                     <input 
                                         type="email" 
-                                        className="input-field pl-12 bg-white/5 cursor-not-allowed text-slate-500" 
+                                        className="input-field input-with-icon bg-white/5 cursor-not-allowed text-slate-500" 
                                         value={profile.email}
                                         disabled
                                     />
@@ -101,11 +101,11 @@ export default function StudentProfile() {
 
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-slate-400 ml-1">College / University</label>
-                            <div className="relative">
-                                <School className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+                            <div className="glass-input-group relative">
+                                <School className="icon-left" size={18} />
                                 <input 
                                     type="text" 
-                                    className="input-field pl-12" 
+                                    className="input-field input-with-icon" 
                                     value={profile.college}
                                     onChange={e => setProfile({...profile, college: e.target.value})}
                                 />
