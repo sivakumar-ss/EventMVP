@@ -50,7 +50,7 @@ export default function StudentDashboard() {
       // Refresh data
       const myRegs = await studentApi.getRegistrations();
       setMyRegistrations(myRegs.data);
-      navigate('/student/my-events');
+      navigate('/student/my-events?print=' + event.id);
     } catch (err) {
       toast.error(err.response?.data?.error || err.response?.data?.message || 'Registration failed');
     }

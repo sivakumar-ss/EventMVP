@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { studentApi } from '../../services/api';
 import Sidebar from '../../components/Sidebar';
 import { Download, Calendar, MapPin, ExternalLink, CheckCircle, Clock, Zap, Shield, Award } from 'lucide-react';
@@ -9,12 +10,26 @@ export default function MyEvents() {
   const [loading, setLoading] = useState(true);
   const [selectedReg, setSelectedReg] = useState(null);
   const printRef = useRef(null);
+  
+  const location = useLocation();
 
   useEffect(() => {
     const fetchMyEvents = async () => {
       try {
         const res = await studentApi.getRegistrations();
         setRegistrations(res.data);
+
+        // Check if we need to auto-print a certificate after registration
+        const params = new URLSearchParams(location.search);
+        const printEventId = params.get('print');
+        if (printEventId) {
+            const printReg = res.data.find(r => r.id.toString() === printEventId);
+            if (printReg) {
+                // Short delay to ensure rendering is complete before printing
+                setSelectedReg(printReg);
+                setTimeout(() => window.print(), 500);
+            }
+        }
       } catch (err) {
         toast.error('Failed to load your registrations');
       } finally {
@@ -86,18 +101,15 @@ export default function MyEvents() {
                   </div>
 
                   <div className="shrink-0 space-y-3 w-full md:w-auto">
-                    {reg.status === 'CLOSED' ? (
-                        <button 
-                            onClick={() => handleDownloadCertificate(reg)}
-                            className="w-full flex items-center justify-center gap-2 btn-primary !py-2.5 !px-6 text-sm"
-                        >
-                            <Award size={16} /> Get Certificate
-                        </button>
-                    ) : (
-                        <div className="flex items-center gap-2 text-emerald-400 font-bold px-4 py-2 bg-emerald-500/5 rounded-xl border border-emerald-500/10">
-                            <CheckCircle size={18} /> Confirmed
-                        </div>
-                    )}
+                    <div className="flex items-center gap-2 text-emerald-400 font-bold px-4 py-2 bg-emerald-500/5 rounded-xl border border-emerald-500/10 justify-center">
+                        <CheckCircle size={18} /> Confirmed
+                    </div>
+                    <button 
+                        onClick={() => handleDownloadCertificate(reg)}
+                        className="w-full flex items-center justify-center gap-2 btn-primary !py-2.5 !px-6 text-sm"
+                    >
+                        <Award size={16} /> Get Certificate
+                    </button>
                     <button className="w-full text-slate-400 hover:text-white text-xs font-medium flex items-center justify-center gap-1 transition-colors">
                         View Details <ExternalLink size={12} />
                     </button>

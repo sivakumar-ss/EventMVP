@@ -39,7 +39,7 @@ export default function BrowseEvents() {
       toast.success(`Registered for ${event.title}`);
       const regs = await studentApi.getRegistrations();
       setMyRegs(regs.data);
-      navigate('/student/my-events');
+      navigate('/student/my-events?print=' + event.id);
     } catch (err) {
       toast.error(err.response?.data?.error || err.response?.data?.message || 'Failed to register');
     }
