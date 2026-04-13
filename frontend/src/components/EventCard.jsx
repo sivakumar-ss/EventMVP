@@ -18,7 +18,7 @@ export default function EventCard({ event, onRegister, registered, isAdmin, onEd
       {/* Image */}
       <div className="relative h-44 overflow-hidden">
         <img
-          src={event.image}
+          src={event.image || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80'}
           alt={event.title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           onError={e => { e.target.src = 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80'; }}

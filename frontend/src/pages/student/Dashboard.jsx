@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { studentApi, eventApi } from '../../services/api';
 import { StatCard } from '../../components/StatCard';
@@ -14,6 +15,7 @@ export default function StudentDashboard() {
   const [events, setEvents] = useState([]);
   const [myRegistrations, setMyRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,6 +50,7 @@ export default function StudentDashboard() {
       // Refresh data
       const myRegs = await studentApi.getRegistrations();
       setMyRegistrations(myRegs.data);
+      navigate('/student/my-events');
     } catch (err) {
       toast.error(err.response?.data?.error || err.response?.data?.message || 'Registration failed');
     }

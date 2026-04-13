@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { eventApi, studentApi } from '../../services/api';
 import EventCard from '../../components/EventCard';
 import Sidebar from '../../components/Sidebar';
@@ -11,6 +12,8 @@ export default function BrowseEvents() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('All');
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,6 +39,7 @@ export default function BrowseEvents() {
       toast.success(`Registered for ${event.title}`);
       const regs = await studentApi.getRegistrations();
       setMyRegs(regs.data);
+      navigate('/student/my-events');
     } catch (err) {
       toast.error(err.response?.data?.error || err.response?.data?.message || 'Failed to register');
     }
