@@ -14,6 +14,7 @@ export default function StudentDashboard() {
   const [stats, setStats] = useState({ total: 0, registered: 0, upcoming: 0 });
   const [events, setEvents] = useState([]);
   const [myRegistrations, setMyRegistrations] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -27,6 +28,15 @@ export default function StudentDashboard() {
         
         setEvents(allEvents.data.slice(0, 3)); // Just show recent 3
         setMyRegistrations(myRegs.data);
+        
+        // Convert registrations to recent activity notifications
+        const regNotifications = myRegs.data.map(reg => ({
+            id: reg.id,
+            message: `You are registered for "${reg.title}"`,
+            time: 'Active',
+            type: 'success'
+        }));
+        setNotifications([...regNotifications, ...mockNotifications].slice(0, 5));
         
         const registeredIds = new Set(myRegs.data.map(r => r.id));
         setStats({
@@ -109,12 +119,15 @@ export default function StudentDashboard() {
                   <h2 className="text-xl font-bold text-white">Notifications</h2>
                 </div>
                 <div className="space-y-4">
-                  {mockNotifications.map(n => (
-                    <div key={n.id} className="p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
-                      <p className="text-sm text-white/90 leading-snug mb-1">{n.message}</p>
-                      <p className="text-xs text-slate-500">{n.time}</p>
+                  {notifications.map((n, i) => (
+                    <div key={i} className={`p-4 rounded-2xl border transition-all ${n.type === 'success' ? 'bg-emerald-500/5 border-emerald-500/10' : 'bg-white/5 border-white/5 hover:bg-white/10'}`}>
+                      <p className={`text-sm leading-snug mb-1 ${n.type === 'success' ? 'text-emerald-400 font-medium' : 'text-white/90'}`}>{n.message}</p>
+                      <p className="text-[10px] text-slate-500 opacity-60 uppercase font-bold tracking-wider">{n.time}</p>
                     </div>
                   ))}
+                  {notifications.length === 0 && (
+                    <p className="text-center text-slate-500 text-sm py-4 italic">No new activity.</p>
+                  )}
                 </div>
               </section>
 
