@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { studentApi } from '../../services/api';
 import Sidebar from '../../components/Sidebar';
 import { Download, Calendar, MapPin, ExternalLink, CheckCircle, Clock, Zap, Shield, Award } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function MyEvents() {
+  const { user } = useAuth();
   const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedReg, setSelectedReg] = useState(null);
@@ -152,7 +154,7 @@ export default function MyEvents() {
                     <h1 className="text-5xl font-serif font-extrabold text-indigo-900 uppercase tracking-widest">Certificate of Participation</h1>
                     <p className="text-xl italic text-slate-600 font-serif">This certifies that</p>
                     <h2 className="text-4xl font-bold text-slate-800 border-b-2 border-slate-300 pb-2 inline-block px-10">
-                        {selectedReg.user?.name || 'Active Student'}
+                        {user?.name || 'Active Student'}
                     </h2>
                     <p className="text-lg text-slate-600 font-serif max-w-xl mx-auto">
                         has successfully participated in the event <br/>
