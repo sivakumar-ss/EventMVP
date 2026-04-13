@@ -26,7 +26,7 @@ export default function StudentDashboard() {
         setEvents(allEvents.data.slice(0, 3)); // Just show recent 3
         setMyRegistrations(myRegs.data);
         
-        const registeredIds = new Set(myRegs.data.map(r => r.event.id));
+        const registeredIds = new Set(myRegs.data.map(r => r.id));
         setStats({
           total: allEvents.data.length,
           registered: myRegs.data.length,
@@ -49,7 +49,7 @@ export default function StudentDashboard() {
       const myRegs = await studentApi.getRegistrations();
       setMyRegistrations(myRegs.data);
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Registration failed');
+      toast.error(err.response?.data?.error || err.response?.data?.message || 'Registration failed');
     }
   };
 

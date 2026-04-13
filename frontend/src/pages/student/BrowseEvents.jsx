@@ -37,7 +37,7 @@ export default function BrowseEvents() {
       const regs = await studentApi.getRegistrations();
       setMyRegs(regs.data);
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to register');
+      toast.error(err.response?.data?.error || err.response?.data?.message || 'Failed to register');
     }
   };
 
@@ -103,7 +103,7 @@ export default function BrowseEvents() {
                   <EventCard
                     key={event.id}
                     event={event}
-                    registered={myRegs.some(r => r.event.id === event.id)}
+                    registered={myRegs.some(r => r.id === event.id)}
                     onRegister={handleRegister}
                   />
                 ))}

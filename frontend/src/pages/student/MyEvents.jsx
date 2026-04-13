@@ -26,7 +26,7 @@ export default function MyEvents() {
 
   const handleDownloadCertificate = (reg) => {
     setSelectedReg(reg);
-    toast.success(`Preparing certificate for ${reg.event.title}...`);
+    toast.success(`Preparing certificate for ${reg.title}...`);
     setTimeout(() => {
         window.print();
         setSelectedReg(null);
@@ -55,38 +55,38 @@ export default function MyEvents() {
                 <div key={reg.id} className="glass rounded-3xl p-6 border border-white/5 flex flex-col md:flex-row items-center gap-6 group hover:bg-white/[0.03] transition-all">
                   <div className="w-full md:w-32 h-32 rounded-2xl overflow-hidden shrink-0">
                     <img 
-                        src={reg.event.image || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80'} 
-                        alt={reg.event.title} 
+                        src={reg.image || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80'} 
+                        alt={reg.title} 
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
                     />
                   </div>
                   
                   <div className="flex-1 text-center md:text-left">
                     <div className="flex flex-col md:flex-row md:items-center gap-2 mb-2">
-                        <h3 className="text-xl font-bold text-white">{reg.event.title}</h3>
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${reg.event.status === 'UPCOMING' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
-                            {reg.event.status}
+                        <h3 className="text-xl font-bold text-white">{reg.title}</h3>
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${reg.status === 'UPCOMING' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                            {reg.status}
                         </span>
                     </div>
                     
                     <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm text-slate-400 mb-4">
                         <div className="flex items-center gap-1.5">
                             <Calendar size={14} className="text-indigo-400" />
-                            <span>{new Date(reg.event.date || reg.event.eventDate).toLocaleDateString()}</span>
+                            <span>{new Date(reg.date).toLocaleDateString()}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                             <MapPin size={14} className="text-indigo-400" />
-                            <span>{reg.event.venue}</span>
+                            <span>{reg.venue}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                             <Clock size={14} className="text-indigo-400" />
-                            <span>Registered on {new Date(reg.registeredAt).toLocaleDateString()}</span>
+                            <span>Status: {reg.status}</span>
                         </div>
                     </div>
                   </div>
 
                   <div className="shrink-0 space-y-3 w-full md:w-auto">
-                    {reg.event.status === 'CLOSED' ? (
+                    {reg.status === 'CLOSED' ? (
                         <button 
                             onClick={() => handleDownloadCertificate(reg)}
                             className="w-full flex items-center justify-center gap-2 btn-primary !py-2.5 !px-6 text-sm"
@@ -144,8 +144,8 @@ export default function MyEvents() {
                     </h2>
                     <p className="text-lg text-slate-600 font-serif max-w-xl mx-auto">
                         has successfully participated in the event <br/>
-                        <span className="font-bold text-indigo-700 font-sans">"{selectedReg.event.title}"</span><br/>
-                        held at {selectedReg.event.venue} on {new Date(selectedReg.event.date || selectedReg.event.eventDate).toLocaleDateString()}.
+                        <span className="font-bold text-indigo-700 font-sans">"{selectedReg.title}"</span><br/>
+                        held at {selectedReg.venue} on {new Date(selectedReg.date).toLocaleDateString()}.
                     </p>
 
                     <div className="pt-20 flex justify-between px-20 relative">
@@ -167,7 +167,7 @@ export default function MyEvents() {
                         </div>
                     </div>
                     
-                    <p className="text-[10px] text-slate-400 pt-10">Verification ID: {selectedReg.id.slice(0, 8).toUpperCase()}-{Date.now()}</p>
+                    <p className="text-[10px] text-slate-400 pt-10">Verification ID: {selectedReg.id.toString().slice(0, 8).toUpperCase()}-{Date.now()}</p>
                 </div>
             </div>
         </div>
