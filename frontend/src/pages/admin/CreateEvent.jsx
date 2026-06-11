@@ -4,7 +4,7 @@ import { adminApi } from '../../services/api';
 import Sidebar from '../../components/Sidebar';
 import { 
   Plus, Calendar, MapPin, AlignLeft, 
-  Image as ImageIcon, Users, Tag, Save, X 
+  Image as ImageIcon, Users, Tag, Save, X, QrCode 
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -19,7 +19,8 @@ export default function CreateEvent() {
     venue: '',
     category: 'Technical',
     maxParticipants: 100,
-    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&q=80'
+    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&q=80',
+    paymentScanner: 'https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg'
   });
 
   const handleSubmit = async (e) => {
@@ -27,13 +28,15 @@ export default function CreateEvent() {
     setLoading(true);
 
     try {
-      // Backend expects: title, date (ISO), venue, description
-      // Our form has a bit more, we'll combine date/time if needed or just pass date
       const eventPayload = {
         title: formData.title,
         description: formData.description,
         venue: formData.venue,
-        eventDate: new Date(`${formData.date}T${formData.time}:00`).toISOString()
+        eventDate: new Date(`${formData.date}T${formData.time}:00`).toISOString(),
+        category: formData.category,
+        maxParticipants: formData.maxParticipants,
+        image: formData.image,
+        paymentScanner: formData.paymentScanner
       };
 
       await adminApi.createEvent(eventPayload);
@@ -196,6 +199,28 @@ export default function CreateEvent() {
                                 onChange={e => setFormData({...formData, image: e.target.value})}
                              />
                              <p className="text-[10px] text-slate-500">Image should be at least 1200x600 for best results.</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Payment QR Code */}
+                <div className="pt-6 border-t border-white/5">
+                     <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
+                        <QrCode className="text-indigo-400" size={18} /> Payment UPI Scanner
+                    </h3>
+                    <div className="flex items-center gap-6">
+                        <div className="w-24 h-24 p-2 rounded-2xl overflow-hidden bg-white shrink-0">
+                            <img src={formData.paymentScanner} alt="QR Preview" className="w-full h-full object-contain" />
+                        </div>
+                        <div className="flex-1 space-y-2">
+                             <input 
+                                type="text" 
+                                placeholder="Paste Payment QR Image URL here..."
+                                className="input-field" 
+                                value={formData.paymentScanner}
+                                onChange={e => setFormData({...formData, paymentScanner: e.target.value})}
+                             />
+                             <p className="text-[10px] text-slate-500">Students will scan this QR code to pay for registration.</p>
                         </div>
                     </div>
                 </div>

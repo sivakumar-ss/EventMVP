@@ -10,17 +10,32 @@ import StudentDashboard from './pages/student/Dashboard';
 import BrowseEvents from './pages/student/BrowseEvents';
 import MyEvents from './pages/student/MyEvents';
 import StudentProfile from './pages/student/Profile';
+import StudentNetwork from './pages/student/Network';
 import AdminDashboard from './pages/admin/Dashboard';
 import ManageEvents from './pages/admin/ManageEvents';
 import CreateEvent from './pages/admin/CreateEvent';
 import Reports from './pages/admin/Reports';
+import AdminSettings from './pages/admin/Settings';
+import MasterDashboard from './pages/master-admin/Dashboard';
+import MasterAccounts from './pages/master-admin/Accounts';
 
 const ProtectedRoute = ({ children, role }) => {
   const { user, loading } = useAuth();
 
-  if (loading) return null; // Or a loader component
+  if (loading) return null;
   if (!user) return <Navigate to="/student/login" />;
   if (role && user.role !== role) return <Navigate to="/" />;
+
+  return children;
+};
+
+// Allow both ROLE_ADMIN and ROLE_MASTER_ADMIN to access admin routes
+const AdminRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) return null;
+  if (!user) return <Navigate to="/student/login" />;
+  if (user.role !== 'ROLE_ADMIN' && user.role !== 'ROLE_MASTER_ADMIN') return <Navigate to="/" />;
 
   return children;
 };
@@ -51,26 +66,48 @@ function AppContent() {
               <StudentProfile />
             </ProtectedRoute>
           } />
+          <Route path="/student/network" element={
+            <ProtectedRoute role="ROLE_STUDENT">
+              <StudentNetwork />
+            </ProtectedRoute>
+          } />
 
           {/* Admin Routes */}
           <Route path="/admin/dashboard" element={
-            <ProtectedRoute role="ROLE_ADMIN">
+            <AdminRoute>
               <AdminDashboard />
-            </ProtectedRoute>
+            </AdminRoute>
           } />
           <Route path="/admin/events" element={
-            <ProtectedRoute role="ROLE_ADMIN">
+            <AdminRoute>
               <ManageEvents />
-            </ProtectedRoute>
+            </AdminRoute>
           } />
           <Route path="/admin/create-event" element={
-            <ProtectedRoute role="ROLE_ADMIN">
+            <AdminRoute>
               <CreateEvent />
-            </ProtectedRoute>
+            </AdminRoute>
           } />
           <Route path="/admin/reports" element={
-            <ProtectedRoute role="ROLE_ADMIN">
+            <AdminRoute>
               <Reports />
+            </AdminRoute>
+          } />
+          <Route path="/admin/settings" element={
+            <AdminRoute>
+              <AdminSettings />
+            </AdminRoute>
+          } />
+
+          {/* Master Admin Routes */}
+          <Route path="/master-admin/dashboard" element={
+            <ProtectedRoute role="ROLE_MASTER_ADMIN">
+              <MasterDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/master-admin/accounts" element={
+            <ProtectedRoute role="ROLE_MASTER_ADMIN">
+              <MasterAccounts />
             </ProtectedRoute>
           } />
         </Routes>
@@ -94,3 +131,4 @@ export default function App() {
     </ThemeProvider>
   );
 }
+// Trigger dev HMR reload

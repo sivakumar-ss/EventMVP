@@ -19,7 +19,7 @@ export default function ManageEvents() {
 
   const fetchEvents = async () => {
     try {
-      const res = await eventApi.getAllPublic();
+      const res = await adminApi.getAdminEvents();
       setEvents(res.data);
     } catch (err) {
       toast.error('Failed to load events');

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { eventApi, studentApi } from '../../services/api';
 import EventCard from '../../components/EventCard';
 import Sidebar from '../../components/Sidebar';
+import PaymentModal from '../../components/PaymentModal';
 import { Search, Filter, SlidersHorizontal, LayoutGrid, List as ListIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -12,6 +13,8 @@ export default function BrowseEvents() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('All');
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -33,15 +36,21 @@ export default function BrowseEvents() {
     fetchData();
   }, []);
 
-  const handleRegister = async (event) => {
+  const handleRegister = (event) => {
+    setSelectedEvent(event);
+    setIsModalOpen(true);
+  };
+
+  const handlePaymentSubmit = async (paymentData) => {
     try {
-      await studentApi.registerForEvent(event.id);
-      toast.success(`Registered for ${event.title}`);
+      await studentApi.registerForEvent(selectedEvent.id, paymentData);
+      toast.success(`Registration submitted for ${selectedEvent.title}`);
       const regs = await studentApi.getRegistrations();
       setMyRegs(regs.data);
-      navigate('/student/my-events?print=' + event.id);
+      setIsModalOpen(false);
+      navigate('/student/my-events');
     } catch (err) {
-      toast.error(err.response?.data?.error || err.response?.data?.message || 'Failed to register');
+      toast.error(err.response?.data?.error || err.response?.data?.message || 'Failed to submit registration');
     }
   };
 
@@ -123,6 +132,13 @@ export default function BrowseEvents() {
               )}
             </>
           )}
+
+          <PaymentModal 
+            isOpen={isModalOpen}
+            event={selectedEvent}
+            onClose={() => setIsModalOpen(false)}
+            onSubmit={handlePaymentSubmit}
+          />
         </div>
       </div>
     </div>

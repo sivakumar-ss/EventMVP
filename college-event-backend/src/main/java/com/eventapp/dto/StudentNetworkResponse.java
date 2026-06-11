@@ -1,16 +1,20 @@
 package com.eventapp.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequest {
+@Builder
+public class StudentNetworkResponse {
+    private Long id;
     private String name;
     private String email;
-    private String password;
     private String collegeName;
-    private String role; // "ADMIN" or "STUDENT"
+    private int followersCount;
+    private int followingCount;
+    private boolean isFollowing;
 }

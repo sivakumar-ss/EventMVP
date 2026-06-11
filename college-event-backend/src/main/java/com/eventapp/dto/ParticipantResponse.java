@@ -10,8 +10,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class ParticipantResponse {
+    private Long registrationId;
     private String name;
     private String email;
     private String role;
     private String registeredDate;
+    private String utrNumber;
+    private String paymentScreenshot;
+    private String status;
 }

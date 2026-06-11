@@ -1,25 +1,34 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Calendar, BookmarkCheck, User, 
-  Settings, LogOut, ChevronRight, Zap, ListChecks, BarChart3, Plus
+  Settings, LogOut, ChevronRight, Zap, ListChecks, BarChart3, 
+  PlusCircle, Users
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 
 export default function Sidebar() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const isAdmin = user?.role === 'ROLE_ADMIN';
+
+  const handleLogout = () => {
+    logout();
+    toast.success('Logged out successfully');
+    navigate('/');
+  };
 
   const menuItems = isAdmin ? [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
-    { icon: Plus, label: 'Create Event', path: '/admin/create-event' },
+    { icon: PlusCircle, label: 'Create Event', path: '/admin/create-event' },
     { icon: ListChecks, label: 'Manage Events', path: '/admin/events' },
     { icon: BarChart3, label: 'Reports', path: '/admin/reports' },
   ] : [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/student/dashboard' },
     { icon: Calendar, label: 'Browse Events', path: '/student/events' },
     { icon: BookmarkCheck, label: 'My Registrations', path: '/student/my-events' },
+    { icon: Users, label: 'My Network', path: '/student/network' },
     { icon: User, label: 'My Profile', path: '/student/profile' },
   ];
 
@@ -60,25 +69,27 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <div className="p-4 mt-auto border-t border-white/5">
-        <div className="glass p-4 rounded-2xl border border-white/10 bg-indigo-600/5 group">
-            <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm ring-2 ring-slate-950">
-                    {user?.name?.[0].toUpperCase()}
-                </div>
-                <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-white truncate">{user?.name}</p>
-                    <p className="text-[10px] text-slate-500 font-medium truncate uppercase">{user?.role.replace('ROLE_', '')}</p>
-                </div>
-            </div>
-            <button 
-                onClick={logout}
-                className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-white/5 text-rose-400 hover:bg-rose-500 hover:text-white text-xs font-bold transition-all duration-300"
-            >
-                <LogOut size={14} /> Sign Out
-            </button>
+      {user && (
+        <div className="p-4 mt-auto border-t border-white/5">
+          <div className="glass p-4 rounded-2xl border border-white/10 bg-indigo-600/5 group">
+              <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm ring-2 ring-slate-950">
+                      {user.name?.[0]?.toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-white truncate">{user.name}</p>
+                      <p className="text-[10px] text-slate-500 font-medium truncate uppercase">{user.role?.replace('ROLE_', '')}</p>
+                  </div>
+              </div>
+              <button 
+                  onClick={handleLogout}
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-white/5 text-rose-400 hover:bg-rose-500 hover:text-white text-xs font-bold transition-all duration-300"
+              >
+                  <LogOut size={14} /> Sign Out
+              </button>
+          </div>
         </div>
-      </div>
+      )}
     </aside>
   );
 }

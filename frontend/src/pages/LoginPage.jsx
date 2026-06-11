@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { authApi } from '../services/api';
 import toast from 'react-hot-toast';
-import { Mail, Lock, User, ShieldCheck, ArrowRight, Zap } from 'lucide-react';
+import { Mail, Lock, User, ShieldCheck, ArrowRight, Zap, School } from 'lucide-react';
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -15,6 +15,7 @@ export default function LoginPage() {
     name: '',
     email: '',
     password: '',
+    collegeName: '',
     role: 'STUDENT', // Default role
   });
 
@@ -31,17 +32,20 @@ export default function LoginPage() {
         // Since I'm the developer of the backend too, I know it returns name if I update it, but for now I'll just use the email as name.
         login({ name: formData.email.split('@')[0], role: res.data.role, id: res.data.userId }, res.data.token);
         toast.success(`Welcome back!`);
-        navigate(res.data.role === 'ROLE_ADMIN' ? '/admin/dashboard' : '/student/dashboard');
+        const dashPath = res.data.role === 'ROLE_MASTER_ADMIN' ? '/master-admin/dashboard' : res.data.role === 'ROLE_ADMIN' ? '/admin/dashboard' : '/student/dashboard';
+        navigate(dashPath);
       } else {
         const res = await authApi.register({ 
             name: formData.name, 
             email: formData.email, 
             password: formData.password, 
+            collegeName: formData.role === 'ADMIN' ? formData.collegeName : null,
             role: formData.role 
         });
         login({ name: formData.name, role: res.data.role, id: res.data.userId }, res.data.token);
         toast.success('Account created successfully!');
-        navigate(res.data.role === 'ROLE_ADMIN' ? '/admin/dashboard' : '/student/dashboard');
+        const regDashPath = res.data.role === 'ROLE_MASTER_ADMIN' ? '/master-admin/dashboard' : res.data.role === 'ROLE_ADMIN' ? '/admin/dashboard' : '/student/dashboard';
+        navigate(regDashPath);
       }
     } catch (err) {
       toast.error(err.response?.data?.message || 'Authentication failed');
@@ -135,6 +139,24 @@ export default function LoginPage() {
                   Admin
                 </button>
               </div>
+            </div>
+          )}
+
+          {!isLogin && formData.role === 'ADMIN' && (
+            <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+              <label className="text-sm font-medium text-slate-300 ml-1">College Name</label>
+              <div className="glass-input-group relative">
+                <School className="icon-left" size={18} />
+                <input
+                  required
+                  type="text"
+                  placeholder="e.g. Stanford University"
+                  className="input-field input-with-icon"
+                  value={formData.collegeName}
+                  onChange={(e) => setFormData({ ...formData, collegeName: e.target.value })}
+                />
+              </div>
+              <p className="text-[10px] text-slate-500 ml-1 italic">This will be displayed as the hosting college for your events.</p>
             </div>
           )}
 

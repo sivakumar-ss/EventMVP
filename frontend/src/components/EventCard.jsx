@@ -1,4 +1,4 @@
-import { Calendar, MapPin, Users, ArrowRight, CheckCircle, XCircle } from 'lucide-react';
+import { Calendar, MapPin, Users, ArrowRight, CheckCircle, XCircle, School } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function EventCard({ event, onRegister, registered, isAdmin, onEdit, onDelete }) {
@@ -6,11 +6,11 @@ export default function EventCard({ event, onRegister, registered, isAdmin, onEd
   const fillPercent = Math.round((event.registeredCount / event.maxParticipants) * 100);
 
   const categoryColors = {
-    Technical: 'text-cyan-400 bg-cyan-400/10',
-    Cultural: 'text-pink-400 bg-pink-400/10',
-    Sports: 'text-green-400 bg-green-400/10',
-    Workshop: 'text-orange-400 bg-orange-400/10',
-    Seminar: 'text-purple-400 bg-purple-400/10',
+    Technical: 'text-indigo-600 bg-indigo-100 border-indigo-300',
+    Cultural: 'text-pink-600 bg-pink-100 border-pink-300',
+    Sports: 'text-green-600 bg-green-100 border-green-300',
+    Workshop: 'text-orange-600 bg-orange-100 border-orange-300',
+    Seminar: 'text-purple-600 bg-purple-100 border-purple-300',
   };
 
   return (
@@ -28,12 +28,12 @@ export default function EventCard({ event, onRegister, registered, isAdmin, onEd
         {/* Status badge */}
         <div className="absolute top-3 left-3">
           {event.status === 'UPCOMING' ? (
-            <span className="flex items-center gap-1 px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-full border border-emerald-500/30 backdrop-blur-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full border border-emerald-300 backdrop-blur-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
               Upcoming
             </span>
           ) : (
-            <span className="flex items-center gap-1 px-3 py-1 bg-red-500/20 text-red-400 text-xs font-semibold rounded-full border border-red-500/30 backdrop-blur-sm">
+            <span className="flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full border border-red-300 backdrop-blur-sm">
               <XCircle size={11} />
               Closed
             </span>
@@ -42,7 +42,7 @@ export default function EventCard({ event, onRegister, registered, isAdmin, onEd
 
         {/* Category */}
         <div className="absolute top-3 right-3">
-          <span className={`px-2.5 py-1 text-xs font-semibold rounded-full backdrop-blur-sm border border-white/10 ${categoryColors[event.category] || 'text-slate-400 bg-slate-400/10'}`}>
+          <span className={`px-2.5 py-1 text-xs font-semibold rounded-full backdrop-blur-sm border ${categoryColors[event.category] || 'text-gray-600 bg-gray-100 border-gray-300'}`}>
             {event.category}
           </span>
         </div>
@@ -50,46 +50,56 @@ export default function EventCard({ event, onRegister, registered, isAdmin, onEd
 
       {/* Content */}
       <div className="p-5 flex flex-col flex-1">
-        <h3 className="text-white font-bold text-base mb-2 line-clamp-2 leading-snug">{event.title}</h3>
-        <p className="text-slate-400 text-xs mb-3 line-clamp-2 leading-relaxed">{event.description}</p>
+        <h3 className="text-gray-900 font-bold text-base mb-1 line-clamp-2 leading-snug">{event.title}</h3>
+        <div className="flex items-center gap-1.5 mb-2">
+            <School size={12} className="text-indigo-600" />
+            <span className="text-[10px] font-bold text-gray-600 uppercase tracking-wider">{event.collegeName || 'General Event'}</span>
+        </div>
+        <p className="text-gray-600 text-xs mb-3 line-clamp-2 leading-relaxed">{event.description}</p>
 
-        <div className="space-y-1.5 mb-4 text-xs text-slate-400">
+        <div className="space-y-1.5 mb-4 text-xs text-gray-600">
           <div className="flex items-center gap-2">
-            <Calendar size={12} className="text-indigo-400 shrink-0" />
+            <Calendar size={12} className="text-indigo-600 shrink-0" />
             <span>{new Date(event.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })} · {event.time}</span>
           </div>
           <div className="flex items-center gap-2">
-            <MapPin size={12} className="text-indigo-400 shrink-0" />
+            <MapPin size={12} className="text-indigo-600 shrink-0" />
             <span>{event.venue}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Users size={12} className="text-indigo-400 shrink-0" />
+            <Users size={12} className="text-indigo-600 shrink-0" />
             <span>{event.registeredCount} / {event.maxParticipants} registered</span>
           </div>
         </div>
 
         {/* Progress bar */}
         <div className="mb-4">
-          <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+          <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all duration-500 ${fillPercent >= 90 ? 'bg-red-500' : fillPercent >= 70 ? 'bg-amber-500' : 'bg-indigo-500'}`}
+              className={`h-full rounded-full transition-all duration-500 ${fillPercent >= 90 ? 'bg-red-500' : fillPercent >= 70 ? 'bg-amber-500' : 'bg-indigo-600'}`}
               style={{ width: `${fillPercent}%` }}
             />
           </div>
-          <p className="text-[10px] text-slate-500 mt-1">{fillPercent}% filled</p>
+          <p className="text-[10px] text-gray-500 mt-1">{fillPercent}% filled</p>
         </div>
 
         {/* Actions */}
         <div className="mt-auto">
           {isAdmin ? (
             <div className="flex gap-2">
-              <button onClick={() => onEdit?.(event)} className="flex-1 text-xs py-2 rounded-xl border border-indigo-500/40 text-indigo-400 hover:bg-indigo-500/10 transition-all font-medium">Edit</button>
-              <button onClick={() => onDelete?.(event)} className="flex-1 text-xs py-2 rounded-xl border border-red-500/40 text-red-400 hover:bg-red-500/10 transition-all font-medium">Delete</button>
+              <button onClick={() => onEdit?.(event)} className="flex-1 text-xs py-2 rounded-xl border border-indigo-600 text-indigo-600 hover:bg-indigo-50 transition-all font-medium">Edit</button>
+              <button onClick={() => onDelete?.(event)} className="flex-1 text-xs py-2 rounded-xl border border-red-600 text-red-600 hover:bg-red-50 transition-all font-medium">Delete</button>
             </div>
           ) : registered ? (
-            <div className="flex items-center gap-2 text-emerald-400 text-xs font-semibold">
-              <CheckCircle size={15} />
-              <span>Registered</span>
+            <div className="flex flex-col gap-2 w-full">
+              <div className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border text-[10px] font-bold uppercase tracking-wider ${
+                event.registrationStatus === 'VERIFIED' ? 'bg-emerald-100 text-emerald-700 border-emerald-300' :
+                event.registrationStatus === 'REJECTED' ? 'bg-red-100 text-red-700 border-red-300' :
+                'bg-amber-100 text-amber-700 border-amber-300'
+              }`}>
+                {event.registrationStatus === 'VERIFIED' ? <CheckCircle size={13} /> : event.registrationStatus === 'REJECTED' ? <XCircle size={13} /> : <div className="w-2.5 h-2.5 rounded-full bg-amber-600 animate-pulse" />}
+                <span>{event.registrationStatus || 'PENDING'}</span>
+              </div>
             </div>
           ) : (
             <button
@@ -97,8 +107,8 @@ export default function EventCard({ event, onRegister, registered, isAdmin, onEd
               disabled={event.status === 'CLOSED' || isFull}
               className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
                 event.status === 'CLOSED' || isFull
-                  ? 'bg-white/5 text-slate-500 cursor-not-allowed'
-                  : 'bg-indigo-600 hover:bg-indigo-500 text-white hover:shadow-lg hover:shadow-indigo-600/30 active:scale-95'
+                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                  : 'bg-indigo-600 hover:bg-indigo-700 text-white hover:shadow-lg hover:shadow-indigo-600/30 active:scale-95'
               }`}
             >
               {isFull ? 'Seats Full' : event.status === 'CLOSED' ? 'Registration Closed' : <>Register Now <ArrowRight size={13} /></>}

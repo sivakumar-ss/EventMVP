@@ -1,21 +1,62 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary-50: #eef2ff;
-  --color-primary-100: #e0e7ff;
-  --color-primary-200: #c7d2fe;
-  --color-primary-300: #a5b4fc;
-  --color-primary-400: #818cf8;
-  --color-primary-500: #6366f1;
-  --color-primary-600: #4f46e5;
-  --color-primary-700: #4338ca;
-  --color-primary-800: #3730a3;
-  --color-primary-900: #312e81;
-  --color-primary-950: #1e1b4b;
+  /* Swap base slate colors for inversion to light theme */
+  --color-slate-5: #ffffff;
+  --color-slate-50: #ffffff;  /* Primary page background: Pure White */
+  --color-slate-100: #f3f2ef; /* Secondary off-white background */
+  --color-slate-200: #eef3f8; /* LinkedIn light blue-grey */
+  --color-slate-300: #dedede; /* Border colors */
+  --color-slate-400: #5e5e5e; /* Secondary text medium-grey */
+  --color-slate-500: #7f7f7f; /* Muted placeholder text */
+  --color-slate-600: #333333; /* Dark text */
+  --color-slate-700: #191919; /* Heading text - dark slate/black */
+  --color-slate-800: #0f172a;
+  --color-slate-900: #020617;
+  --color-slate-950: #ffffff; /* Override dark container background */
 
-  --color-accent-400: #22d3ee;
-  --color-accent-500: #06b6d4;
-  --color-accent-600: #0891b2;
+  /* Invert White and Black */
+  --color-white: #191919;    /* text-white class translates to LinkedIn dark grey */
+  --color-black: #ffffff;
+
+  /* Shift Indigo/Purple/Cyan to LinkedIn Blue theme */
+  --color-indigo-50: #f4f8fa;
+  --color-indigo-100: #eef3f8;
+  --color-indigo-200: #cce4f6;
+  --color-indigo-300: #78b6ec;
+  --color-indigo-400: #378fe9;
+  --color-indigo-500: #0073b1;
+  --color-indigo-600: #0a66c2; /* LinkedIn Brand Blue */
+  --color-indigo-700: #004182; /* LinkedIn Hover Blue */
+  --color-indigo-800: #002c5c;
+  --color-indigo-900: #001c3d;
+  --color-indigo-950: #000c1f;
+
+  --color-purple-50: #f4f8fa;
+  --color-purple-100: #eef3f8;
+  --color-purple-200: #cce4f6;
+  --color-purple-300: #0a66c2;
+  --color-purple-400: #0a66c2;
+  --color-purple-500: #0a66c2;
+  --color-purple-600: #004182;
+  --color-purple-700: #002c5c;
+  --color-purple-800: #001c3d;
+  --color-purple-900: #000c1f;
+
+  --color-cyan-400: #378fe9;
+  --color-cyan-500: #0a66c2;
+
+  --color-primary-50: #f4f8fa;
+  --color-primary-100: #eef3f8;
+  --color-primary-200: #cce4f6;
+  --color-primary-300: #78b6ec;
+  --color-primary-400: #378fe9;
+  --color-primary-500: #0a66c2;
+  --color-primary-600: #0a66c2;
+  --color-primary-700: #004182;
+  --color-primary-800: #002c5c;
+  --color-primary-900: #001c3d;
+  --color-primary-950: #000c1f;
 }
 
 @layer base {
@@ -30,42 +71,93 @@
   body {
     @apply font-sans antialiased;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #ffffff !important;
+    color: #191919 !important;
   }
 }
 
 @layer utilities {
   .glass {
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafb 100%) !important;
+    border: 1px solid #d4d9e0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(10, 102, 194, 0.06) !important;
   }
 
   .glass-dark {
-    background: rgba(15, 15, 40, 0.6);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafb 100%) !important;
+    border: 1px solid #d4d9e0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(10, 102, 194, 0.06) !important;
   }
 
   .card-hover {
-    @apply transition-all duration-300 hover:shadow-2xl hover:-translate-y-1;
+    @apply transition-all duration-300 hover:shadow-2xl hover:-translate-y-2;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(10, 102, 194, 0.06) !important;
+  }
+  
+  .card-hover:hover {
+    box-shadow: 0 8px 24px rgba(10, 102, 194, 0.15), 0 12px 32px rgba(0, 0, 0, 0.1) !important;
   }
 
   .gradient-text {
-    @apply bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent;
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    -webkit-text-fill-color: unset !important;
+    color: #0a66c2 !important; /* LinkedIn Blue */
+    font-weight: 700;
   }
 
   .btn-primary {
-    @apply bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/30 active:scale-95;
+    background-color: #0a66c2 !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px; /* LinkedIn Capsule Button style */
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-primary:hover {
+    background-color: #004182 !important;
+    box-shadow: 0 4px 12px rgba(10, 102, 194, 0.25) !important;
+  }
+
+  .btn-primary:active {
+    transform: scale(0.96);
   }
 
   .btn-secondary {
-    @apply border border-indigo-500 text-indigo-400 hover:bg-indigo-500 hover:text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 active:scale-95;
+    border: 1px solid #0a66c2 !important;
+    color: #0a66c2 !important;
+    background-color: transparent !important;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-secondary:hover {
+    background-color: rgba(10, 102, 194, 0.08) !important;
+    color: #0a66c2 !important;
+  }
+
+  .btn-secondary:active {
+    transform: scale(0.96);
   }
 
   .input-field {
-    @apply w-full bg-white/10 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-white/20 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-300;
+    @apply w-full rounded-xl px-4 py-3.5 transition-all duration-300;
+    background-color: #ffffff !important;
+    border: 1px solid #b0b0b0 !important;
+    color: #191919 !important;
+  }
+
+  .input-field::placeholder {
+    color: #7f7f7f !important;
+  }
+
+  .input-field:focus {
+    border-color: #0a66c2 !important;
+    box-shadow: 0 0 0 4px rgba(10, 102, 194, 0.15) !important;
+    outline: none;
   }
 
   .input-with-icon {
@@ -73,35 +165,53 @@
   }
 
   .icon-left {
-    @apply absolute left-4.5 top-1/2 -translate-y-1/2 text-slate-500 transition-colors duration-300 pointer-events-none;
+    @apply absolute left-4.5 top-1/2 -translate-y-1/2 text-slate-400 transition-colors duration-300 pointer-events-none;
   }
 
   .glass-input-group:focus-within .icon-left {
-    @apply text-indigo-400;
+    color: #0a66c2 !important;
   }
 
   .sidebar-link {
-    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all duration-200 cursor-pointer;
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 cursor-pointer;
+    color: #5e5e5e !important;
+  }
+
+  .sidebar-link:hover {
+    background-color: rgba(10, 102, 194, 0.05) !important;
+    color: #0a66c2 !important;
   }
 
   .sidebar-link-active {
-    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-white bg-indigo-600/80 shadow-lg shadow-indigo-600/20;
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl;
+    background-color: #0a66c2 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(10, 102, 194, 0.2) !important;
+  }
+
+  .sidebar-link-active * {
+    color: #ffffff !important;
   }
 
   .stat-card {
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    @apply rounded-2xl p-6 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafb 100%) !important;
+    border: 1px solid #d4d9e0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(10, 102, 194, 0.06) !important;
+    @apply rounded-2xl p-6 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2;
+  }
+  
+  .stat-card:hover {
+    box-shadow: 0 8px 24px rgba(10, 102, 194, 0.15), 0 12px 32px rgba(0, 0, 0, 0.1) !important;
   }
 
   .section-title {
-    @apply text-3xl font-bold text-white mb-2;
+    @apply text-3xl font-bold mb-2;
+    color: #191919 !important;
   }
   
   .section-sub {
-    @apply text-slate-400 mb-8;
+    @apply mb-8;
+    color: #5e5e5e !important;
   }
 
   .scrollbar-hide {
@@ -121,8 +231,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
-  50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.6); }
+  0%, 100% { box-shadow: 0 0 20px rgba(10, 102, 194, 0.15); }
+  50% { box-shadow: 0 0 40px rgba(10, 102, 194, 0.3); }
 }
 
 @keyframes shimmer {
@@ -139,7 +249,189 @@
 }
 
 .skeleton {
-  background: linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.05) 100%);
+  background: linear-gradient(90deg, rgba(0,0,0,0.03) 0%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.03) 100%);
   background-size: 1000px 100%;
   animation: shimmer 1.5s infinite;
 }
+
+/* ========================================================
+   GLOBAL LIGHT THEME EXPLICIT COLOR OVERRIDES
+   ======================================================== */
+
+/* Background overrides */
+.bg-slate-950, #root, main, .flex-1 {
+  background-color: #ffffff !important; /* Pure White background */
+}
+
+/* Sidebar & Navbar should have a clean, light surface */
+aside, nav {
+  background-color: #ffffff !important;
+  border-color: #dedede !important;
+}
+
+/* Text Colors: Darken standard headings & paras */
+.text-white, h1, h2, h3, h4, h5, h6 {
+  color: #191919 !important;
+}
+
+.text-slate-400, .text-slate-500, p, span.text-slate-400 {
+  color: #5e5e5e !important;
+}
+
+.text-slate-300 {
+  color: #191919 !important;
+}
+
+/* Buttons / Accents */
+.bg-indigo-600 {
+  background-color: #0a66c2 !important;
+}
+
+.bg-indigo-600:hover {
+  background-color: #004182 !important;
+}
+
+.hover\:bg-indigo-700:hover {
+  background-color: #004182 !important;
+}
+
+.text-indigo-400, .text-indigo-600 {
+  color: #0a66c2 !important;
+}
+
+.border-indigo-500, .border-indigo-600 {
+  border-color: #0a66c2 !important;
+}
+
+/* Force pure white text inside filled components */
+.btn-primary,
+.btn-primary *,
+button.bg-indigo-600,
+button.bg-indigo-600 *,
+.sidebar-link-active,
+.sidebar-link-active *,
+.bg-emerald-500,
+.bg-emerald-500 *,
+.bg-red-500,
+.bg-red-500 *,
+.bg-indigo-600 *,
+.bg-indigo-600 {
+  color: #ffffff !important;
+}
+
+/* Keep solid bg-white white */
+.bg-white {
+  background-color: #ffffff !important;
+}
+
+/* Translucent Dark Borders & Dividers */
+.border-white\/5, .border-white\/10, .border-white\/15, .border-b-white\/5 {
+  border-color: #e0e0e0 !important;
+}
+
+.bg-white\/5 {
+  background-color: #f3f2ef !important; /* Light LinkedIn grey */
+}
+
+.bg-white\/10 {
+  background-color: #e2e8f0 !important;
+}
+
+.divide-white\/5 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #e0e0e0 !important;
+}
+
+/* Toast override readability */
+.go3133388832 {
+  background: #ffffff !important;
+  color: #191919 !important;
+  border: 1px solid #dedede !important;
+}
+
+/* Contrast Fixes for Badges and Semantics */
+.text-cyan-400 {
+  color: #0369a1 !important; /* sky-700 */
+}
+.bg-cyan-400\/10 {
+  background-color: rgba(3, 105, 161, 0.1) !important;
+}
+
+.text-pink-400 {
+  color: #be185d !important; /* pink-700 */
+}
+.bg-pink-400\/10 {
+  background-color: rgba(190, 24, 93, 0.1) !important;
+}
+
+.text-green-400 {
+  color: #15803d !important; /* green-700 */
+}
+.bg-green-400\/10 {
+  background-color: rgba(21, 128, 61, 0.1) !important;
+}
+
+.text-orange-400 {
+  color: #c2410c !important; /* orange-700 */
+}
+.bg-orange-400\/10 {
+  background-color: rgba(194, 65, 12, 0.1) !important;
+}
+
+.text-purple-400 {
+  color: #6d28d9 !important; /* purple-700 */
+}
+.bg-purple-400\/10 {
+  background-color: rgba(109, 40, 217, 0.1) !important;
+}
+
+.text-emerald-400 {
+  color: #047857 !important; /* emerald-700 */
+}
+.bg-emerald-500\/15, .bg-emerald-500\/20 {
+  background-color: rgba(4, 120, 87, 0.1) !important;
+}
+.border-emerald-500\/30 {
+  border-color: rgba(4, 120, 87, 0.2) !important;
+}
+
+.text-red-400 {
+  color: #b91c1c !important; /* red-700 */
+}
+.bg-red-500\/15, .bg-red-500\/20 {
+  background-color: rgba(185, 28, 28, 0.1) !important;
+}
+.border-red-500\/30 {
+  border-color: rgba(185, 28, 28, 0.2) !important;
+}
+
+.text-amber-400 {
+  color: #b45309 !important; /* amber-700 */
+}
+.bg-amber-500\/10 {
+  background-color: rgba(180, 83, 9, 0.1) !important;
+}
+.border-amber-500\/20 {
+  border-color: rgba(180, 83, 9, 0.2) !important;
+}
+
+/* Neutralize colored glow shadows for light theme */
+.shadow-indigo-500\/15,
+.shadow-indigo-500\/20,
+.shadow-indigo-600\/20,
+.shadow-indigo-600\/30,
+.shadow-purple-500\/20,
+.shadow-purple-600\/30,
+.shadow-amber-500\/20,
+.shadow-cyan-500\/20,
+.shadow-2xl,
+.shadow-lg {
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05) !important;
+}
+
+/* Hover shadow effects mapping */
+.hover\:shadow-lg:hover,
+.hover\:shadow-2xl:hover,
+.hover\:shadow-indigo-600\/30:hover {
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08) !important;
+}
+

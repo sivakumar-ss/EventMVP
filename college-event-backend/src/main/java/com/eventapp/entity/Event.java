@@ -19,11 +19,23 @@ public class Event {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false, length = 1000)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
     @Column(nullable = false)
     private String venue;
+
+    @Column(nullable = false)
+    private Integer maxParticipants;
+
+    @Column(nullable = false)
+    private String category;
+
+    @Column(name = "payment_scanner", columnDefinition = "TEXT")
+    private String paymentScanner;
+
+    @Column(columnDefinition = "TEXT")
+    private String image;
 
     @Column(nullable = false)
     private LocalDateTime eventDate;
@@ -35,15 +47,6 @@ public class Event {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_id", nullable = false)
     private User admin;
-
-    @Column(nullable = false)
-    private String category;
-
-    @Column(nullable = false)
-    private int maxParticipants;
-
-    @Column(length = 500)
-    private String image;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

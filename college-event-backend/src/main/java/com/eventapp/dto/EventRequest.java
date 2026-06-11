@@ -14,6 +14,7 @@ public class EventRequest {
     private String venue;
     private LocalDateTime eventDate;
     private String category;
-    private int maxParticipants;
+    private Integer maxParticipants;
     private String image;
+    private String paymentScanner;
 }

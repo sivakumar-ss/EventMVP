@@ -58,9 +58,9 @@ export default function Navbar() {
                     onClick={() => setShowProfile(!showProfile)}
                     className="flex items-center gap-2 p-1 pl-3 rounded-full border border-white/10 hover:bg-white/5 transition-all"
                   >
-                    <span className="hidden md:block text-xs font-bold text-slate-300">{user.name}</span>
+                    <span className="hidden md:block text-xs font-bold text-slate-300">{user?.name}</span>
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold ring-2 ring-slate-950">
-                      {user.name?.[0].toUpperCase()}
+                      {user?.name?.[0]?.toUpperCase()}
                     </div>
                   </button>
 
@@ -69,10 +69,10 @@ export default function Navbar() {
                       <div className="fixed inset-0 z-10" onClick={() => setShowProfile(false)} />
                       <div className="absolute right-0 mt-3 w-56 glass p-2 rounded-2xl border border-white/10 shadow-2xl z-20 animate-in fade-in zoom-in-95 duration-200">
                         <div className="px-3 py-2 border-b border-white/5 mb-1">
-                          <p className="text-sm font-bold text-white mb-0.5">{user.name}</p>
-                          <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">{user.role.replace('ROLE_', '')}</p>
+                          <p className="text-sm font-bold text-white mb-0.5">{user?.name}</p>
+                          <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">{user?.role?.replace('ROLE_', '')}</p>
                         </div>
-                        <Link to={user.role === 'ROLE_ADMIN' ? '/admin/dashboard' : '/student/dashboard'} className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+                        <Link to={user?.role === 'ROLE_MASTER_ADMIN' ? '/master-admin/dashboard' : user?.role === 'ROLE_ADMIN' ? '/admin/dashboard' : '/student/dashboard'} className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all">
                           <User size={16} /> Dashboard
                         </Link>
                         <button 

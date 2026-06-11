@@ -18,8 +18,11 @@ public class EventResponse {
     private String time; // Added time
     private String status;
     private String adminName;
+    private String collegeName;
     private String category;
     private String image;
-    private int registeredCount; // Changed from participantCount
-    private int maxParticipants;
+    private String paymentScanner;
+    private Integer registeredCount; // Changed from participantCount
+    private Integer maxParticipants;
+    private String registrationStatus;
 }

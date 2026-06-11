@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { adminApi, eventApi } from '../../services/api';
 import Sidebar from '../../components/Sidebar';
-import { Search, Mail, Download, Users, ArrowLeft, Filter } from 'lucide-react';
+import { Search, Mail, Download, Users, ArrowLeft, Filter, CheckCircle, XCircle } from 'lucide-react';
 import { mockParticipants } from '../../data/mockData';
 import toast from 'react-hot-toast';
 
@@ -42,8 +42,20 @@ export default function Participants() {
 
   const filteredParticipants = participants.filter(p => 
     p.name.toLowerCase().includes(search.toLowerCase()) || 
-    p.email.toLowerCase().includes(search.toLowerCase())
+    p.email.toLowerCase().includes(search.toLowerCase()) ||
+    p.utrNumber?.toLowerCase().includes(search.toLowerCase())
   );
+
+  const handleVerify = async (registrationId, verified) => {
+    try {
+      await adminApi.verifyRegistration(registrationId, verified);
+      toast.success(`Registration ${verified ? 'verified' : 'rejected'}`);
+      const partRes = await adminApi.getParticipants(eventId);
+      setParticipants(partRes.data);
+    } catch (err) {
+      toast.error('Failed to update status');
+    }
+  };
 
   return (
     <div className="flex">
@@ -91,8 +103,8 @@ export default function Participants() {
                     <thead>
                         <tr className="bg-white/[0.02]">
                             <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Student info</th>
-                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Role</th>
-                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Registration Date</th>
+                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">UTR Number</th>
+                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
                             <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Actions</th>
                         </tr>
                     </thead>
@@ -111,17 +123,39 @@ export default function Participants() {
                                     </div>
                                 </td>
                                 <td className="px-6 py-4">
-                                    <span className="px-2 py-1 bg-white/5 text-slate-300 text-[10px] font-bold rounded-lg border border-white/5 uppercase">
-                                        {p.role || 'Student'}
+                                     <p className="text-sm font-mono text-indigo-400">{p.utrNumber || 'N/A'}</p>
+                                     <p className="text-[10px] text-slate-500 uppercase mt-0.5">{new Date(p.registeredDate).toLocaleDateString()}</p>
+                                </td>
+                                <td className="px-6 py-4">
+                                    <span className={`px-2 py-1 text-[10px] font-bold rounded-lg border uppercase ${
+                                        p.status === 'VERIFIED' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                                        p.status === 'REJECTED' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                                        'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                                    }`}>
+                                        {p.status || 'PENDING'}
                                     </span>
                                 </td>
-                                <td className="px-6 py-4 text-sm text-slate-400">
-                                    {new Date(p.registeredDate || Date.now()).toLocaleDateString()}
-                                </td>
                                 <td className="px-6 py-4 text-right">
-                                    <button className="w-9 h-9 glass rounded-lg inline-flex items-center justify-center text-slate-500 hover:text-white transition-all">
-                                        <Mail size={16} />
-                                    </button>
+                                    <div className="flex justify-end gap-2">
+                                        {p.paymentScreenshot && (
+                                            <a href={p.paymentScreenshot} target="_blank" rel="noreferrer" className="w-9 h-9 glass rounded-lg inline-flex items-center justify-center text-slate-400 hover:text-white transition-all" title="View Screenshot">
+                                                <Download size={16} />
+                                            </a>
+                                        )}
+                                        {p.status === 'PENDING' && (
+                                            <>
+                                                <button onClick={() => handleVerify(p.registrationId, true)} className="w-9 h-9 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white rounded-lg inline-flex items-center justify-center transition-all" title="Verify">
+                                                    <CheckCircle size={16} />
+                                                </button>
+                                                <button onClick={() => handleVerify(p.registrationId, false)} className="w-9 h-9 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-lg inline-flex items-center justify-center transition-all" title="Reject">
+                                                    <XCircle size={16} />
+                                                </button>
+                                            </>
+                                        )}
+                                        <button className="w-9 h-9 glass rounded-lg inline-flex items-center justify-center text-slate-500 hover:text-white transition-all">
+                                            <Mail size={16} />
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}

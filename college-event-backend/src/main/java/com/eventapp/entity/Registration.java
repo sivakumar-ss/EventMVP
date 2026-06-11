@@ -26,11 +26,22 @@ public class Registration {
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
+    @Column(name = "utr_number", length = 1000)
+    private String utrNumber;
+
+    @Column(name = "payment_screenshot", columnDefinition = "TEXT")
+    private String paymentScreenshot;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RegistrationStatus status;
+
     @Column(name = "registered_at", updatable = false)
     private LocalDateTime registeredAt;
 
     @PrePersist
     protected void onCreate() {
         this.registeredAt = LocalDateTime.now();
+        if (this.status == null) this.status = RegistrationStatus.PENDING;
     }
 }

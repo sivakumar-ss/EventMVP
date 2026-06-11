@@ -5,6 +5,7 @@ import { studentApi, eventApi } from '../../services/api';
 import { StatCard } from '../../components/StatCard';
 import EventCard from '../../components/EventCard';
 import Sidebar from '../../components/Sidebar';
+import PaymentModal from '../../components/PaymentModal';
 import { Calendar, CheckCircle, Zap, Bell, ArrowRight } from 'lucide-react';
 import { mockNotifications } from '../../data/mockData';
 import toast from 'react-hot-toast';
@@ -16,6 +17,8 @@ export default function StudentDashboard() {
   const [myRegistrations, setMyRegistrations] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -53,16 +56,20 @@ export default function StudentDashboard() {
     fetchData();
   }, []);
 
-  const handleRegister = async (event) => {
+  const handleRegister = (event) => {
+    setSelectedEvent(event);
+    setIsModalOpen(true);
+  };
+
+  const handlePaymentSubmit = async (paymentData) => {
     try {
-      await studentApi.registerForEvent(event.id);
-      toast.success(`Successfully registered for ${event.title}`);
-      // Refresh data
+      await studentApi.registerForEvent(selectedEvent.id, paymentData);
+      toast.success(`Registration submitted for ${selectedEvent.title}. Verification pending.`);
       const myRegs = await studentApi.getRegistrations();
       setMyRegistrations(myRegs.data);
-      navigate('/student/my-events?print=' + event.id);
+      setIsModalOpen(false);
     } catch (err) {
-      toast.error(err.response?.data?.error || err.response?.data?.message || 'Registration failed');
+      toast.error(err.response?.data?.error || err.response?.data?.message || 'Submission failed');
     }
   };
 
@@ -140,6 +147,13 @@ export default function StudentDashboard() {
               </section>
             </div>
           </div>
+
+          <PaymentModal 
+            isOpen={isModalOpen}
+            event={selectedEvent}
+            onClose={() => setIsModalOpen(false)}
+            onSubmit={handlePaymentSubmit}
+          />
         </div>
       </div>
     </div>

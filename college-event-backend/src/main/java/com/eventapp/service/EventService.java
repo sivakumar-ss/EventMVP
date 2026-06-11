@@ -3,10 +3,8 @@ package com.eventapp.service;
 import com.eventapp.dto.EventRequest;
 import com.eventapp.dto.EventResponse;
 import com.eventapp.dto.ParticipantResponse;
-import com.eventapp.entity.Event;
-import com.eventapp.entity.EventStatus;
-import com.eventapp.entity.Registration;
-import com.eventapp.entity.User;
+import com.eventapp.dto.RegistrationRequest;
+import com.eventapp.entity.*;
 import com.eventapp.repository.EventRepository;
 import com.eventapp.repository.RegistrationRepository;
 import com.eventapp.repository.UserRepository;
@@ -35,14 +33,15 @@ public class EventService {
 
         Event event = Event.builder()
                 .title(request.getTitle())
-                .description(request.getDescription())
+                .description(request.getDescription() != null ? request.getDescription() : "")
                 .venue(request.getVenue())
                 .eventDate(request.getEventDate())
-                .category(request.getCategory())
-                .maxParticipants(request.getMaxParticipants())
-                .image(request.getImage())
-                .admin(admin)
+                .category(request.getCategory() != null ? request.getCategory() : "General")
+                .maxParticipants(request.getMaxParticipants() != null ? request.getMaxParticipants() : 100)
                 .status(EventStatus.UPCOMING)
+                .admin(admin)
+                .image(request.getImage() != null ? request.getImage() : "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800&q=80")
+                .paymentScanner(request.getPaymentScanner() != null ? request.getPaymentScanner() : "https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg")
                 .build();
 
         Event savedEvent = eventRepository.save(event);
@@ -54,6 +53,15 @@ public class EventService {
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
+
+    public List<EventResponse> getAdminEvents(String adminEmail) {
+        User admin = userRepository.findByEmail(adminEmail)
+                .orElseThrow(() -> new RuntimeException("Admin not found"));
+
+        return eventRepository.findByAdmin(admin).stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
     
     public EventResponse getEventById(Long eventId) {
         Event event = eventRepository.findById(eventId)
@@ -61,7 +69,7 @@ public class EventService {
         return mapToResponse(event);
     }
 
-    public void registerForEvent(Long eventId, String studentEmail) {
+    public void registerForEvent(Long eventId, String studentEmail, RegistrationRequest request) {
         User student = userRepository.findByEmail(studentEmail)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
 
@@ -72,8 +80,9 @@ public class EventService {
             throw new RuntimeException("Event registrations are closed");
         }
 
+        int maxParticipants = event.getMaxParticipants() != null ? event.getMaxParticipants() : 0;
         int currentCount = registrationRepository.findByEvent(event).size();
-        if (event.getMaxParticipants() > 0 && currentCount >= event.getMaxParticipants()) {
+        if (maxParticipants > 0 && currentCount >= maxParticipants) {
              throw new RuntimeException("Event is already full");
         }
 
@@ -84,6 +93,9 @@ public class EventService {
         Registration registration = Registration.builder()
                 .student(student)
                 .event(event)
+                .utrNumber(request.getUtrNumber())
+                .paymentScreenshot(request.getPaymentScreenshot())
+                .status(RegistrationStatus.PENDING)
                 .build();
 
         registrationRepository.save(registration);
@@ -94,7 +106,11 @@ public class EventService {
                 .orElseThrow(() -> new RuntimeException("Student not found"));
 
         return registrationRepository.findByStudent(student).stream()
-                .map(reg -> mapToResponse(reg.getEvent()))
+                .map(reg -> {
+                    EventResponse response = mapToResponse(reg.getEvent());
+                    response.setRegistrationStatus(reg.getStatus() != null ? reg.getStatus().name() : "PENDING");
+                    return response;
+                })
                 .collect(Collectors.toList());
     }
     
@@ -104,12 +120,28 @@ public class EventService {
                 
         return registrationRepository.findByEvent(event).stream()
                 .map(reg -> ParticipantResponse.builder()
+                        .registrationId(reg.getId())
                         .name(reg.getStudent().getName())
                         .email(reg.getStudent().getEmail())
                         .role(reg.getStudent().getRole().name())
                         .registeredDate(reg.getRegisteredAt().format(DATE_FORMATTER))
+                        .utrNumber(reg.getUtrNumber())
+                        .paymentScreenshot(reg.getPaymentScreenshot())
+                        .status(reg.getStatus() != null ? reg.getStatus().name() : "PENDING")
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public void verifyRegistration(Long registrationId, boolean verified, String adminEmail) {
+        Registration registration = registrationRepository.findById(registrationId)
+                .orElseThrow(() -> new RuntimeException("Registration not found"));
+
+        if (!registration.getEvent().getAdmin().getEmail().equals(adminEmail)) {
+            throw new RuntimeException("Not authorized to verify this registration");
+        }
+
+        registration.setStatus(verified ? RegistrationStatus.VERIFIED : RegistrationStatus.REJECTED);
+        registrationRepository.save(registration);
     }
     
     public EventResponse closeEvent(Long eventId, String adminEmail) {
@@ -136,10 +168,12 @@ public class EventService {
                 .time(event.getEventDate().format(TIME_FORMATTER))
                 .status(event.getStatus().name())
                 .adminName(event.getAdmin().getName())
+                .collegeName(event.getAdmin().getCollegeName() != null ? event.getAdmin().getCollegeName() : "Unknown College")
                 .category(event.getCategory() != null ? event.getCategory() : "General")
                 .image(event.getImage())
-                .registeredCount(count)
+                .paymentScanner(event.getPaymentScanner())
                 .maxParticipants(event.getMaxParticipants())
+                .registeredCount(count)
                 .build();
     }
 }

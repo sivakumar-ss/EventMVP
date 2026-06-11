@@ -33,11 +33,13 @@ public class AuthService {
         if ("ADMIN".equalsIgnoreCase(request.getRole()) || "ROLE_ADMIN".equalsIgnoreCase(request.getRole())) {
             role = Role.ROLE_ADMIN;
         }
+        // MASTER_ADMIN cannot be self-registered — only seeded via database
 
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .collegeName(request.getCollegeName())
                 .role(role)
                 .build();
 
