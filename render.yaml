@@ -9,7 +9,6 @@ services:
   - type: web
     name: eventmvp-backend
     runtime: docker
-    plan: free
     rootDir: college-event-backend
     dockerfilePath: ./Dockerfile
     envVars:
@@ -32,7 +31,6 @@ services:
   - type: web
     name: eventmvp-frontend
     runtime: static
-    plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
