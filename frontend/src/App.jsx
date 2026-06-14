@@ -14,6 +14,7 @@ import StudentNetwork from './pages/student/Network';
 import AdminDashboard from './pages/admin/Dashboard';
 import ManageEvents from './pages/admin/ManageEvents';
 import CreateEvent from './pages/admin/CreateEvent';
+import Participants from './pages/admin/Participants';
 import Reports from './pages/admin/Reports';
 import AdminSettings from './pages/admin/Settings';
 import MasterDashboard from './pages/master-admin/Dashboard';
@@ -96,6 +97,11 @@ function AppContent() {
           <Route path="/admin/settings" element={
             <AdminRoute>
               <AdminSettings />
+            </AdminRoute>
+          } />
+          <Route path="/admin/participants" element={
+            <AdminRoute>
+              <Participants />
             </AdminRoute>
           } />
 

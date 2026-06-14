@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { adminApi, eventApi } from '../../services/api';
 import Sidebar from '../../components/Sidebar';
-import { Search, Mail, Download, Users, ArrowLeft, Filter, CheckCircle, XCircle } from 'lucide-react';
-import { mockParticipants } from '../../data/mockData';
+import { Search, Mail, Download, Users, ArrowLeft, Filter, CheckCircle, XCircle, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function Participants() {
@@ -27,12 +26,12 @@ export default function Participants() {
           setEventDetails(detailsRes.data);
           setParticipants(partRes.data);
         } else {
-          // If no specific event, show all/mock
-          setParticipants(mockParticipants);
+          toast.error('No event selected. Please go back and choose an event.');
         }
       } catch (err) {
-        // Fallback to mock if API fails
-        setParticipants(mockParticipants);
+        const msg = err?.response?.data || err?.message || 'Failed to load participants';
+        toast.error(msg);
+        console.error('Participants fetch error:', err);
       } finally {
         setLoading(false);
       }
@@ -127,14 +126,16 @@ export default function Participants() {
                                      <p className="text-[10px] text-slate-500 uppercase mt-0.5">{new Date(p.registeredDate).toLocaleDateString()}</p>
                                 </td>
                                 <td className="px-6 py-4">
-                                    <span className={`px-2 py-1 text-[10px] font-bold rounded-lg border uppercase ${
-                                        p.status === 'VERIFIED' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                                        p.status === 'REJECTED' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
-                                        'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                                    }`}>
-                                        {p.status || 'PENDING'}
-                                    </span>
-                                </td>
+                                     <span className={`px-2 py-1 text-[10px] font-bold rounded-lg border uppercase ${
+                                         p.status === 'VERIFIED' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                                         p.status === 'REJECTED' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                                         'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                                     }`}>
+                                         {p.status === 'VERIFIED' ? <span className="flex items-center gap-1"><CheckCircle size={10}/> Verified</span> :
+                                          p.status === 'REJECTED' ? <span className="flex items-center gap-1"><XCircle size={10}/> Rejected</span> :
+                                          <span className="flex items-center gap-1"><Clock size={10}/> Pending</span>}
+                                     </span>
+                                 </td>
                                 <td className="px-6 py-4 text-right">
                                     <div className="flex justify-end gap-2">
                                         {p.paymentScreenshot && (

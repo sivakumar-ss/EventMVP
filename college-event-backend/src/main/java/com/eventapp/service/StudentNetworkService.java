@@ -3,7 +3,10 @@ package com.eventapp.service;
 import com.eventapp.dto.StudentNetworkResponse;
 import com.eventapp.entity.Role;
 import com.eventapp.entity.User;
+import com.eventapp.entity.Registration;
+import com.eventapp.entity.RegistrationStatus;
 import com.eventapp.repository.UserRepository;
+import com.eventapp.repository.RegistrationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,13 +20,31 @@ import java.util.stream.Collectors;
 public class StudentNetworkService {
 
     private final UserRepository userRepository;
+    private final RegistrationRepository registrationRepository;
 
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found: " + email));
     }
 
+    private int calculateScore(User student) {
+        List<Registration> regs = registrationRepository.findByStudent(student);
+        int score = 0;
+        for (Registration reg : regs) {
+            if (reg.getStatus() == RegistrationStatus.VERIFIED && reg.isCertificateClaimed()) {
+                if (reg.getEvent() != null && "Technical".equalsIgnoreCase(reg.getEvent().getCategory())) {
+                    score += 10;
+                } else {
+                    score += 5;
+                }
+            }
+        }
+        return score;
+    }
+
     private StudentNetworkResponse toResponse(User targetUser, User currentUser) {
+        boolean isFollowing = currentUser.getFollowing().stream()
+                .anyMatch(u -> u.getId().equals(targetUser.getId()));
         return StudentNetworkResponse.builder()
                 .id(targetUser.getId())
                 .name(targetUser.getName())
@@ -31,7 +52,8 @@ public class StudentNetworkService {
                 .collegeName(targetUser.getCollegeName())
                 .followersCount(targetUser.getFollowers().size())
                 .followingCount(targetUser.getFollowing().size())
-                .isFollowing(currentUser.getFollowing().contains(targetUser))
+                .isFollowing(isFollowing)
+                .score(calculateScore(targetUser))
                 .build();
     }
 
@@ -52,16 +74,17 @@ public class StudentNetworkService {
             throw new RuntimeException("You cannot follow yourself");
         }
 
-        currentUser.getFollowing().add(targetUser);
-        userRepository.save(currentUser);
+        boolean alreadyFollowing = currentUser.getFollowing().stream()
+                .anyMatch(u -> u.getId().equals(targetId));
+        if (!alreadyFollowing) {
+            currentUser.getFollowing().add(targetUser);
+            userRepository.save(currentUser);
+        }
     }
 
     public void unfollow(String currentEmail, Long targetId) {
         User currentUser = getUserByEmail(currentEmail);
-        User targetUser = userRepository.findById(targetId)
-                .orElseThrow(() -> new RuntimeException("Target user not found"));
-
-        currentUser.getFollowing().remove(targetUser);
+        currentUser.getFollowing().removeIf(u -> u.getId().equals(targetId));
         userRepository.save(currentUser);
     }
 
@@ -89,6 +112,7 @@ public class StudentNetworkService {
                 .followersCount(currentUser.getFollowers().size())
                 .followingCount(currentUser.getFollowing().size())
                 .isFollowing(false)
+                .score(calculateScore(currentUser))
                 .build();
     }
 }

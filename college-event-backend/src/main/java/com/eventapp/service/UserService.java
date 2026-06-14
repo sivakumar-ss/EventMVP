@@ -2,6 +2,9 @@ package com.eventapp.service;
 
 import com.eventapp.entity.Role;
 import com.eventapp.entity.User;
+import com.eventapp.entity.Event;
+import com.eventapp.repository.EventRepository;
+import com.eventapp.repository.RegistrationRepository;
 import com.eventapp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +17,8 @@ import java.util.List;
 @Transactional
 public class UserService {
     private final UserRepository userRepository;
+    private final RegistrationRepository registrationRepository;
+    private final EventRepository eventRepository;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -30,10 +35,30 @@ public class UserService {
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
         // Prevent deleting master admin accounts
         if (user.getRole() == Role.ROLE_MASTER_ADMIN) {
             throw new RuntimeException("Cannot delete a Master Admin account");
         }
+
+        // 1. Remove all follow relationships involving this user from the join table
+        //    (both entries where they are the follower AND where they are being followed)
+        userRepository.deleteFollowingByUserId(id);
+        userRepository.deleteFollowersByUserId(id);
+
+        // 2. Delete all event registrations made by this user (as a student)
+        registrationRepository.deleteAll(registrationRepository.findByStudent(user));
+
+        // 3. If this user is an admin: delete all events they created
+        //    and the registrations for those events first (to avoid FK violations)
+        if (user.getRole() == Role.ROLE_ADMIN) {
+            for (Event event : eventRepository.findByAdmin(user)) {
+                registrationRepository.deleteAll(registrationRepository.findByEvent(event));
+            }
+            eventRepository.deleteAll(eventRepository.findByAdmin(user));
+        }
+
+        // 4. Finally delete the user record itself
         userRepository.deleteById(id);
     }
 

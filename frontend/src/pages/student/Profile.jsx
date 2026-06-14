@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Sidebar from '../../components/Sidebar';
-import { User, Mail, School, Camera, Save, Shield } from 'lucide-react';
+import { User, Mail, School, Camera, Save, Shield, Trophy, Users, UserPlus } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { studentApi } from '../../services/api';
 
 export default function StudentProfile() {
   const { user } = useAuth();
@@ -13,6 +14,23 @@ export default function StudentProfile() {
     dept: 'Computer Science & Engineering',
     year: '3rd Year'
   });
+  const [stats, setStats] = useState({ score: 0, followersCount: 0, followingCount: 0 });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await studentApi.getNetworkSummary();
+        setStats({
+          score: res.data.score || 0,
+          followersCount: res.data.followersCount || 0,
+          followingCount: res.data.followingCount || 0
+        });
+      } catch (err) {
+        console.error("Failed to load profile stats", err);
+      }
+    };
+    fetchStats();
+  }, []);
 
   const handleSave = (e) => {
     e.preventDefault();
@@ -52,17 +70,26 @@ export default function StudentProfile() {
                 <div className="glass p-6 rounded-3xl border border-white/5">
                     <h3 className="text-white font-bold mb-4 text-sm">Account Stats</h3>
                     <div className="space-y-4">
-                        <div className="flex justify-between items-center">
-                            <span className="text-slate-500 text-xs">Events Attended</span>
-                            <span className="text-white font-bold">12</span>
+                        <div className="flex justify-between items-center py-1 border-b border-white/5">
+                            <div className="flex items-center gap-2">
+                                <Trophy size={16} className="text-amber-400" />
+                                <span className="text-slate-400 text-xs">Total Score</span>
+                            </div>
+                            <span className="text-amber-400 font-extrabold text-sm">{stats.score} pts</span>
                         </div>
-                        <div className="flex justify-between items-center">
-                            <span className="text-slate-500 text-xs">Workshops Done</span>
-                            <span className="text-white font-bold">5</span>
+                        <div className="flex justify-between items-center py-1 border-b border-white/5">
+                            <div className="flex items-center gap-2">
+                                <Users size={16} className="text-indigo-400" />
+                                <span className="text-slate-400 text-xs">Followers</span>
+                            </div>
+                            <span className="text-white font-bold text-sm">{stats.followersCount}</span>
                         </div>
-                        <div className="flex justify-between items-center">
-                            <span className="text-slate-500 text-xs">Global Rank</span>
-                            <span className="text-white font-bold">#42</span>
+                        <div className="flex justify-between items-center py-1">
+                            <div className="flex items-center gap-2">
+                                <UserPlus size={16} className="text-purple-400" />
+                                <span className="text-slate-400 text-xs">Following</span>
+                            </div>
+                            <span className="text-white font-bold text-sm">{stats.followingCount}</span>
                         </div>
                     </div>
                 </div>

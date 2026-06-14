@@ -79,5 +79,14 @@ public class StudentController {
         String currentEmail = authentication.getName();
         return ResponseEntity.ok(studentNetworkService.getNetworkSummary(currentEmail));
     }
+
+    @PostMapping("/registrations/{registrationId}/claim-certificate")
+    public ResponseEntity<String> claimCertificate(
+            @PathVariable Long registrationId,
+            Authentication authentication) {
+        String studentEmail = authentication.getName();
+        String message = eventService.claimCertificate(registrationId, studentEmail);
+        return ResponseEntity.ok(message);
+    }
 }
 

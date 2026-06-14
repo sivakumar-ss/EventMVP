@@ -17,4 +17,5 @@ public class StudentNetworkResponse {
     private int followersCount;
     private int followingCount;
     private boolean isFollowing;
+    private int score;
 }

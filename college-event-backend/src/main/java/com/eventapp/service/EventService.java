@@ -109,9 +109,35 @@ public class EventService {
                 .map(reg -> {
                     EventResponse response = mapToResponse(reg.getEvent());
                     response.setRegistrationStatus(reg.getStatus() != null ? reg.getStatus().name() : "PENDING");
+                    response.setRegistrationId(reg.getId());
+                    response.setCertificateClaimed(reg.isCertificateClaimed());
                     return response;
                 })
                 .collect(Collectors.toList());
+    }
+
+    public String claimCertificate(Long registrationId, String studentEmail) {
+        Registration registration = registrationRepository.findById(registrationId)
+                .orElseThrow(() -> new RuntimeException("Registration not found"));
+
+        if (!registration.getStudent().getEmail().equals(studentEmail)) {
+            throw new RuntimeException("Not authorized to claim this certificate");
+        }
+
+        if (registration.getStatus() != RegistrationStatus.VERIFIED) {
+            throw new RuntimeException("Certificate only available for verified registrations");
+        }
+
+        if (registration.isCertificateClaimed()) {
+            return "Certificate already claimed. Points were previously awarded.";
+        }
+
+        registration.setCertificateClaimed(true);
+        registrationRepository.save(registration);
+
+        String category = registration.getEvent().getCategory();
+        int points = "Technical".equalsIgnoreCase(category) ? 10 : 5;
+        return "+" + points + " points awarded for claiming your certificate!";
     }
     
     public List<ParticipantResponse> getEventParticipants(Long eventId) {
@@ -124,7 +150,7 @@ public class EventService {
                         .name(reg.getStudent().getName())
                         .email(reg.getStudent().getEmail())
                         .role(reg.getStudent().getRole().name())
-                        .registeredDate(reg.getRegisteredAt().format(DATE_FORMATTER))
+                        .registeredDate(reg.getRegisteredAt() != null ? reg.getRegisteredAt().format(DATE_FORMATTER) : "N/A")
                         .utrNumber(reg.getUtrNumber())
                         .paymentScreenshot(reg.getPaymentScreenshot())
                         .status(reg.getStatus() != null ? reg.getStatus().name() : "PENDING")

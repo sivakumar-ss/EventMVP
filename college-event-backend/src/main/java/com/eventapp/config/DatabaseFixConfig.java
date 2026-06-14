@@ -21,6 +21,8 @@ public class DatabaseFixConfig {
                 jdbcTemplate.execute("ALTER TABLE registrations ADD COLUMN IF NOT EXISTS payment_screenshot VARCHAR(1000)");
                 jdbcTemplate.execute("ALTER TABLE events ADD COLUMN IF NOT EXISTS payment_scanner VARCHAR(1000)");
                 jdbcTemplate.execute("UPDATE registrations SET status = 'PENDING' WHERE status IS NULL");
+                jdbcTemplate.execute("ALTER TABLE registrations ADD COLUMN IF NOT EXISTS certificate_claimed BOOLEAN DEFAULT FALSE");
+                jdbcTemplate.execute("UPDATE registrations SET certificate_claimed = FALSE WHERE certificate_claimed IS NULL");
                 
                 // Alter existing column types to match the increased length limits
                 jdbcTemplate.execute("ALTER TABLE events ALTER COLUMN payment_scanner TYPE TEXT");

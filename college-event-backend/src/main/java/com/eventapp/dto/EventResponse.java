@@ -25,4 +25,6 @@ public class EventResponse {
     private Integer registeredCount; // Changed from participantCount
     private Integer maxParticipants;
     private String registrationStatus;
+    private Long registrationId;
+    private boolean certificateClaimed;
 }

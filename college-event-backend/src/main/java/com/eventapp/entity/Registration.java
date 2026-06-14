@@ -39,6 +39,10 @@ public class Registration {
     @Column(name = "registered_at", updatable = false)
     private LocalDateTime registeredAt;
 
+    @Column(name = "certificate_claimed", nullable = false)
+    @Builder.Default
+    private boolean certificateClaimed = false;
+
     @PrePersist
     protected void onCreate() {
         this.registeredAt = LocalDateTime.now();

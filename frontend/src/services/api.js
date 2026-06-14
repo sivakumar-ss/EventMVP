@@ -61,6 +61,7 @@ export const studentApi = {
   getFollowers: () => api.get('/student/network/followers'),
   getFollowing: () => api.get('/student/network/following'),
   getNetworkSummary: () => api.get('/student/network/summary'),
+  claimCertificate: (registrationId) => api.post(`/student/registrations/${registrationId}/claim-certificate`),
 };
 
 export default api;
