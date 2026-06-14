@@ -1,0 +1,52 @@
+databases:
+  - name: eventmvp-db
+    databaseName: mvphack
+    user: mvphack_user
+    plan: free
+
+services:
+  # ── Backend: Spring Boot Web Service ─────────────────────────────────────
+  - type: web
+    name: eventmvp-backend
+    runtime: java
+    plan: free
+    rootDir: college-event-backend
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -Dspring.profiles.active=prod -jar target/college-event-backend-0.0.1-SNAPSHOT.jar
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: eventmvp-db
+          property: connectionString
+      - key: DATABASE_USERNAME
+        fromDatabase:
+          name: eventmvp-db
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: eventmvp-db
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+
+  # ── Frontend: React/Vite Static Site ─────────────────────────────────────
+  - type: web
+    name: eventmvp-frontend
+    runtime: static
+    plan: free
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    # SPA routing – redirect all 404s to index.html
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      # Set this to the deployed backend URL after backend is created:
+      # e.g. https://eventmvp-backend.onrender.com/api
+      - key: VITE_API_URL
+        value: REPLACE_WITH_BACKEND_URL_AFTER_DEPLOY
