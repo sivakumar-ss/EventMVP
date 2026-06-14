@@ -1,5 +1,6 @@
 package com.eventapp.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +17,7 @@ public class StudentNetworkResponse {
     private String collegeName;
     private int followersCount;
     private int followingCount;
+    @JsonProperty("isFollowing")
     private boolean isFollowing;
     private int score;
 }

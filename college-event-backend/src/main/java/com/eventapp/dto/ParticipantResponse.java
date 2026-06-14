@@ -18,4 +18,5 @@ public class ParticipantResponse {
     private String utrNumber;
     private String paymentScreenshot;
     private String status;
+    private boolean certificateGranted;
 }

@@ -36,6 +36,15 @@ public class AdminController {
         return ResponseEntity.ok(eventService.getEventParticipants(eventId));
     }
 
+    @PutMapping("/events/{eventId}")
+    public ResponseEntity<EventResponse> updateEvent(
+            @PathVariable Long eventId,
+            @RequestBody EventRequest request,
+            Authentication authentication) {
+        String adminEmail = authentication.getName();
+        return ResponseEntity.ok(eventService.updateEvent(eventId, request, adminEmail));
+    }
+
     @PutMapping("/events/{eventId}/close")
     public ResponseEntity<EventResponse> closeEvent(@PathVariable Long eventId, Authentication authentication) {
         String adminEmail = authentication.getName();
@@ -50,5 +59,14 @@ public class AdminController {
         String adminEmail = authentication.getName();
         eventService.verifyRegistration(registrationId, verified, adminEmail);
         return ResponseEntity.ok("Registration status updated successfully");
+    }
+
+    @PostMapping("/registrations/{registrationId}/grant-certificate")
+    public ResponseEntity<String> grantCertificate(
+            @PathVariable Long registrationId,
+            Authentication authentication) {
+        String adminEmail = authentication.getName();
+        eventService.grantCertificate(registrationId, adminEmail);
+        return ResponseEntity.ok("Certificate granted successfully");
     }
 }

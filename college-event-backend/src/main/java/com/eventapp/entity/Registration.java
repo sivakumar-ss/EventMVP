@@ -43,6 +43,10 @@ public class Registration {
     @Builder.Default
     private boolean certificateClaimed = false;
 
+    @Column(name = "certificate_granted", nullable = false)
+    @Builder.Default
+    private boolean certificateGranted = false;
+
     @PrePersist
     protected void onCreate() {
         this.registeredAt = LocalDateTime.now();

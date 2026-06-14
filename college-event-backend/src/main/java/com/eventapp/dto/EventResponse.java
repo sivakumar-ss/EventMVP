@@ -27,4 +27,5 @@ public class EventResponse {
     private String registrationStatus;
     private Long registrationId;
     private boolean certificateClaimed;
+    private boolean certificateGranted;
 }

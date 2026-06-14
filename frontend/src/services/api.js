@@ -36,10 +36,12 @@ export const eventApi = {
 
 export const adminApi = {
   createEvent: (eventData) => api.post('/admin/events', eventData),
+  updateEvent: (id, eventData) => api.put(`/admin/events/${id}`, eventData),
   getAdminEvents: () => api.get('/admin/events'),
   closeEvent: (id) => api.put(`/admin/events/${id}/close`),
   getParticipants: (id) => api.get(`/admin/events/${id}/participants`),
   verifyRegistration: (registrationId, verified) => api.put(`/admin/registrations/${registrationId}/verify?verified=${verified}`),
+  grantCertificate: (registrationId) => api.post(`/admin/registrations/${registrationId}/grant-certificate`),
 };
 
 export const masterAdminApi = {

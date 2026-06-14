@@ -111,6 +111,7 @@ public class EventService {
                     response.setRegistrationStatus(reg.getStatus() != null ? reg.getStatus().name() : "PENDING");
                     response.setRegistrationId(reg.getId());
                     response.setCertificateClaimed(reg.isCertificateClaimed());
+                    response.setCertificateGranted(reg.isCertificateGranted());
                     return response;
                 })
                 .collect(Collectors.toList());
@@ -154,6 +155,7 @@ public class EventService {
                         .utrNumber(reg.getUtrNumber())
                         .paymentScreenshot(reg.getPaymentScreenshot())
                         .status(reg.getStatus() != null ? reg.getStatus().name() : "PENDING")
+                        .certificateGranted(reg.isCertificateGranted())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -169,7 +171,44 @@ public class EventService {
         registration.setStatus(verified ? RegistrationStatus.VERIFIED : RegistrationStatus.REJECTED);
         registrationRepository.save(registration);
     }
+
+    public void grantCertificate(Long registrationId, String adminEmail) {
+        Registration registration = registrationRepository.findById(registrationId)
+                .orElseThrow(() -> new RuntimeException("Registration not found"));
+
+        if (!registration.getEvent().getAdmin().getEmail().equals(adminEmail)) {
+            throw new RuntimeException("Not authorized to grant certificate for this registration");
+        }
+
+        if (registration.getStatus() != RegistrationStatus.VERIFIED) {
+            throw new RuntimeException("Certificate can only be granted for verified registrations");
+        }
+
+        registration.setCertificateGranted(true);
+        registrationRepository.save(registration);
+    }
     
+    public EventResponse updateEvent(Long eventId, EventRequest request, String adminEmail) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
+
+        if (!event.getAdmin().getEmail().equals(adminEmail)) {
+            throw new RuntimeException("Not authorized to update this event");
+        }
+
+        if (request.getTitle() != null) event.setTitle(request.getTitle());
+        if (request.getDescription() != null) event.setDescription(request.getDescription());
+        if (request.getVenue() != null) event.setVenue(request.getVenue());
+        if (request.getEventDate() != null) event.setEventDate(request.getEventDate());
+        if (request.getCategory() != null) event.setCategory(request.getCategory());
+        if (request.getMaxParticipants() != null) event.setMaxParticipants(request.getMaxParticipants());
+        if (request.getImage() != null) event.setImage(request.getImage());
+        if (request.getPaymentScanner() != null) event.setPaymentScanner(request.getPaymentScanner());
+
+        eventRepository.save(event);
+        return mapToResponse(event);
+    }
+
     public EventResponse closeEvent(Long eventId, String adminEmail) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));

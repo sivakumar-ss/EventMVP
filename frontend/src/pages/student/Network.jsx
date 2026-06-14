@@ -46,24 +46,42 @@ export default function StudentNetwork() {
     fetchSummaryAndData();
   };
 
+  // Optimistically flip isFollowing in the local students list for instant UI feedback
+  const toggleFollowingLocally = (id, nowFollowing) => {
+    setStudents(prev =>
+      prev.map(s => s.id === id ? { ...s, isFollowing: nowFollowing } : s)
+    );
+    setFollowers(prev =>
+      prev.map(s => s.id === id ? { ...s, isFollowing: nowFollowing } : s)
+    );
+    setSummary(prev => ({
+      ...prev,
+      followingCount: prev.followingCount + (nowFollowing ? 1 : -1)
+    }));
+  };
+
   const handleFollow = async (id, name) => {
+    toggleFollowingLocally(id, true); // instant UI update
     try {
       await studentApi.followStudent(id);
       toast.success(`You are now following ${name}!`);
-      fetchSummaryAndData();
+      fetchSummaryAndData(); // sync counts in background
     } catch (err) {
       console.error(err);
+      toggleFollowingLocally(id, false); // revert on error
       toast.error('Failed to follow student');
     }
   };
 
   const handleUnfollow = async (id, name) => {
+    toggleFollowingLocally(id, false); // instant UI update
     try {
       await studentApi.unfollowStudent(id);
       toast.success(`You unfollowed ${name}`);
-      fetchSummaryAndData();
+      fetchSummaryAndData(); // sync counts in background
     } catch (err) {
       console.error(err);
+      toggleFollowingLocally(id, true); // revert on error
       toast.error('Failed to unfollow student');
     }
   };
@@ -266,9 +284,12 @@ export default function StudentNetwork() {
                       {student.isFollowing ? (
                         <button
                           onClick={() => handleUnfollow(student.id, student.name)}
-                          className="w-full py-2.5 rounded-xl border border-indigo-600 text-indigo-600 hover:bg-indigo-50 text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                          className="w-full py-2.5 rounded-xl border border-emerald-500 text-emerald-600 bg-emerald-50 hover:bg-red-50 hover:border-red-400 hover:text-red-500 text-xs font-bold transition-all flex items-center justify-center gap-1.5 group/btn"
                         >
-                          <UserMinus size={14} /> Unfollow
+                          <CheckCircle size={14} className="group-hover/btn:hidden" />
+                          <UserMinus size={14} className="hidden group-hover/btn:inline" />
+                          <span className="group-hover/btn:hidden">Following</span>
+                          <span className="hidden group-hover/btn:inline">Unfollow</span>
                         </button>
                       ) : (
                         <button
