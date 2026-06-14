@@ -5,15 +5,13 @@ databases:
     plan: free
 
 services:
-  # ── Backend: Spring Boot Web Service ─────────────────────────────────────
+  # ── Backend: Spring Boot (Docker) ─────────────────────────────────────────
   - type: web
     name: eventmvp-backend
-    runtime: java
+    runtime: docker
     plan: free
     rootDir: college-event-backend
-    buildCommand: ./mvnw clean package -DskipTests
-    startCommand: java -Dspring.profiles.active=prod -jar target/college-event-backend-0.0.1-SNAPSHOT.jar
-    healthCheckPath: /actuator/health
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -29,10 +27,8 @@ services:
           property: password
       - key: JWT_SECRET
         generateValue: true
-      - key: SPRING_PROFILES_ACTIVE
-        value: prod
 
-  # ── Frontend: React/Vite Static Site ─────────────────────────────────────
+  # ── Frontend: React/Vite Static Site ──────────────────────────────────────
   - type: web
     name: eventmvp-frontend
     runtime: static
@@ -40,13 +36,10 @@ services:
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
-    # SPA routing – redirect all 404s to index.html
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
     envVars:
-      # Set this to the deployed backend URL after backend is created:
-      # e.g. https://eventmvp-backend.onrender.com/api
       - key: VITE_API_URL
         value: REPLACE_WITH_BACKEND_URL_AFTER_DEPLOY
