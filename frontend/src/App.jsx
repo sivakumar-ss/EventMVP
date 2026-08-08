@@ -17,8 +17,13 @@ import CreateEvent from './pages/admin/CreateEvent';
 import Participants from './pages/admin/Participants';
 import Reports from './pages/admin/Reports';
 import AdminSettings from './pages/admin/Settings';
+import AdminSupport from './pages/admin/Support';
 import MasterDashboard from './pages/master-admin/Dashboard';
 import MasterAccounts from './pages/master-admin/Accounts';
+import MasterSupportTickets from './pages/master-admin/SupportTickets';
+import AdminRequests from './pages/master-admin/AdminRequests';
+import MasterSecurity from './pages/master-admin/Security';
+import MasterSettings from './pages/master-admin/Settings';
 
 const ProtectedRoute = ({ children, role }) => {
   const { user, loading } = useAuth();
@@ -104,6 +109,11 @@ function AppContent() {
               <Participants />
             </AdminRoute>
           } />
+          <Route path="/admin/support" element={
+            <AdminRoute>
+              <AdminSupport />
+            </AdminRoute>
+          } />
 
           {/* Master Admin Routes */}
           <Route path="/master-admin/dashboard" element={
@@ -114,6 +124,26 @@ function AppContent() {
           <Route path="/master-admin/accounts" element={
             <ProtectedRoute role="ROLE_MASTER_ADMIN">
               <MasterAccounts />
+            </ProtectedRoute>
+          } />
+          <Route path="/master-admin/support-tickets" element={
+            <ProtectedRoute role="ROLE_MASTER_ADMIN">
+              <MasterSupportTickets />
+            </ProtectedRoute>
+          } />
+          <Route path="/master-admin/admin-requests" element={
+            <ProtectedRoute role="ROLE_MASTER_ADMIN">
+              <AdminRequests />
+            </ProtectedRoute>
+          } />
+          <Route path="/master-admin/security" element={
+            <ProtectedRoute role="ROLE_MASTER_ADMIN">
+              <MasterSecurity />
+            </ProtectedRoute>
+          } />
+          <Route path="/master-admin/settings" element={
+            <ProtectedRoute role="ROLE_MASTER_ADMIN">
+              <MasterSettings />
             </ProtectedRoute>
           } />
         </Routes>

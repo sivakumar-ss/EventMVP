@@ -40,6 +40,9 @@ public class Event {
     @Column(nullable = false)
     private LocalDateTime eventDate;
 
+    @Column(columnDefinition = "NUMERIC(10,2) DEFAULT 0.0")
+    private Double fee;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EventStatus status;

@@ -128,7 +128,7 @@ export default function MasterAccounts() {
                 <tbody className="divide-y divide-white/5">
                   {loading ? (
                     [...Array(5)].map((_, i) => (
-                      <tr key={i} className="animate-pulse">
+                      <tr key={i} className="">
                         <td colSpan="4" className="px-6 py-8">
                           <div className="h-4 bg-white/5 rounded w-1/2" />
                         </td>

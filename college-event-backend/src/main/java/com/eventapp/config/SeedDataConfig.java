@@ -35,17 +35,17 @@ public class SeedDataConfig {
             }
 
             // Seed Admin if not exists
-            User admin = userRepository.findByEmail("admin@eventhub.com").orElse(null);
+            User admin = userRepository.findByEmail("admin@nexusevents.com").orElse(null);
             if (admin == null) {
                 admin = User.builder()
                         .name("College Admin")
-                        .email("admin@eventhub.com")
+                        .email("admin@nexusevents.com")
                         .password(passwordEncoder.encode("admin123"))
-                        .collegeName("EventHub National Institute")
+                        .collegeName("NexusEvents National Institute")
                         .role(Role.ROLE_ADMIN)
                         .build();
                 userRepository.save(admin);
-                System.out.println("Default admin created: admin@eventhub.com / admin123");
+                System.out.println("Default admin created: admin@nexusevents.com / admin123");
             }
 
             // Technical Event

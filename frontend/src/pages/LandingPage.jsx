@@ -2,20 +2,22 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Zap, Calendar, Shield, Award, ArrowRight, Star } from 'lucide-react';
 import { testimonials } from '../data/mockData';
+import { useAuth } from '../context/AuthContext';
 
 export default function LandingPage() {
+  const { user } = useAuth();
   return (
     <div className="flex flex-col overflow-hidden">
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center pt-20 pb-20">
         {/* Animated Background Elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 bg-slate-950">
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 blur-[120px] rounded-full animate-float" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-600/20 blur-[150px] rounded-full animate-pulse-glow" />
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 blur-[120px] rounded-full " />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-600/20 blur-[150px] rounded-full " />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-white/10 text-indigo-400 text-sm font-medium mb-8 animate-float">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-white/10 text-indigo-400 text-sm font-medium mb-8 ">
             <Zap size={16} /> Now live for University Campus
           </div>
           
@@ -32,9 +34,15 @@ export default function LandingPage() {
             <Link to="/student/events" className="btn-primary flex items-center gap-2 w-full sm:w-auto">
               Explore Events <ArrowRight size={18} />
             </Link>
-            <Link to="/student/login" className="btn-secondary w-full sm:w-auto">
-              Admin Login
-            </Link>
+            {!user ? (
+              <Link to="/student/login" className="btn-secondary w-full sm:w-auto">
+                Admin Login
+              </Link>
+            ) : (
+              <Link to={user.role === 'ROLE_MASTER_ADMIN' ? '/master-admin/dashboard' : user.role === 'ROLE_ADMIN' ? '/admin/dashboard' : '/student/dashboard'} className="btn-secondary w-full sm:w-auto">
+                Go to Dashboard
+              </Link>
+            )}
           </div>
 
           {/* Stats Preview */}
@@ -69,7 +77,7 @@ export default function LandingPage() {
               { icon: Award, title: 'Instant Certificates', desc: 'Automatically generate and download participation certificates after event closure.' },
             ].map((feat, i) => (
               <div key={i} className="glass p-8 rounded-3xl card-hover border border-white/5">
-                <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 mb-6 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300">
+                <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 mb-6 group-hover:bg-indigo-500 group-hover:text-white transition-all ">
                   <feat.icon size={28} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-3">{feat.title}</h3>

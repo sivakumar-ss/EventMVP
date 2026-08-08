@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Users, LogOut, ChevronRight, 
-  Crown, Settings
+  Crown, Settings, ShieldCheck, Shield, BookmarkCheck
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -19,14 +19,18 @@ export default function MasterSidebar() {
 
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/master-admin/dashboard' },
-    { icon: Users, label: 'All Accounts', path: '/master-admin/accounts' },
+    { icon: ShieldCheck, label: 'Admin Requests', path: '/master-admin/admin-requests' },
+    { icon: Users, label: 'User Accounts', path: '/master-admin/accounts' },
+    { icon: Shield, label: 'Security Log', path: '/master-admin/security' },
+    { icon: Settings, label: 'Global Settings', path: '/master-admin/settings' },
+    { icon: BookmarkCheck, label: 'Support Tickets', path: '/master-admin/support-tickets' },
   ];
 
   return (
     <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-slate-950 border-r border-white/5 flex-col z-40 transition-all">
       <div className="h-16 flex items-center px-8 border-b border-white/5">
         <div className="flex items-center gap-2 group">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/20 group-hover:rotate-12 transition-transform">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/20 group-hover:rotate-12 ">
             <Crown size={18} />
           </div>
           <span className="text-xl font-extrabold text-white tracking-tight">MasterHub</span>
@@ -41,7 +45,7 @@ export default function MasterSidebar() {
             to={item.path}
             className={({ isActive }) => `sidebar-link ${isActive ? 'sidebar-link-active text-white' : ''} group`}
           >
-            <item.icon size={20} className="shrink-0 group-hover:scale-110 transition-transform" />
+            <item.icon size={20} className="shrink-0 " />
             <span className="flex-1 font-medium">{item.label}</span>
             <ChevronRight size={14} className="opacity-0 group-hover:opacity-40 transition-opacity text-amber-400" />
           </NavLink>
@@ -62,7 +66,7 @@ export default function MasterSidebar() {
             </div>
             <button 
               onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-white/5 text-rose-400 hover:bg-rose-500 hover:text-white text-xs font-bold transition-all duration-300"
+              className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-white/5 text-rose-400 hover:bg-rose-500 hover:text-white text-xs font-bold transition-all "
             >
               <LogOut size={14} /> Sign Out
             </button>

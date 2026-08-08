@@ -17,4 +17,5 @@ public class EventRequest {
     private Integer maxParticipants;
     private String image;
     private String paymentScanner;
+    private Double fee;
 }

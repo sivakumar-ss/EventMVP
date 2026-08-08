@@ -1,6 +1,6 @@
-# EventHub - College Event Management System
+# NexusEvents - College Event Management System
 
-EventHub is a comprehensive, production-ready platform designed to streamline event management within college campuses. It provides a seamless interface for students to discover and register for events, while offering powerful management tools for administrators.
+NexusEvents is a comprehensive, production-ready platform designed to streamline event management within college campuses. It provides a seamless interface for students to discover and register for events, while offering powerful management tools for administrators.
 
 ## 🚀 Features
 

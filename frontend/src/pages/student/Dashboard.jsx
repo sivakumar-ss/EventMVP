@@ -5,10 +5,29 @@ import { studentApi, eventApi } from '../../services/api';
 import { StatCard } from '../../components/StatCard';
 import EventCard from '../../components/EventCard';
 import Sidebar from '../../components/Sidebar';
+import Feed from '../../components/Feed';
 import PaymentModal from '../../components/PaymentModal';
 import { Calendar, CheckCircle, Zap, Bell, ArrowRight } from 'lucide-react';
 import { mockNotifications } from '../../data/mockData';
 import toast from 'react-hot-toast';
+import { motion } from 'framer-motion';
+
+const containerVariants = {
+  hidden: { opacity: 0, filter: 'blur(10px)' },
+  visible: {
+    opacity: 1,
+    filter: 'blur(0px)',
+    transition: {
+      duration: 0.5,
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+};
 
 export default function StudentDashboard() {
   const { user } = useAuth();
@@ -76,26 +95,40 @@ export default function StudentDashboard() {
   return (
     <div className="flex">
       <Sidebar />
-      <div className="flex-1 lg:ml-64 p-6 lg:p-10">
+      <motion.div 
+        className="flex-1 lg:ml-64 p-6 lg:p-10"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         <div className="max-w-7xl mx-auto">
-          <header className="mb-10">
+          <motion.header variants={itemVariants} className="mb-10">
             <h1 className="text-4xl font-bold text-white mb-2">Welcome back, <span className="gradient-text">{user?.name}</span>! 👋</h1>
             <p className="text-slate-400">Here is what is happening in your campus today.</p>
-          </header>
+          </motion.header>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <StatCard icon={Zap} label="Total Events" value={stats.total} color="indigo" />
             <StatCard icon={CheckCircle} label="My Registrations" value={stats.registered} color="emerald" />
             <StatCard icon={Calendar} label="New Opportunities" value={stats.upcoming} color="cyan" />
-          </div>
+          </motion.div>
 
           <div className="grid lg:grid-cols-3 gap-10">
-            {/* Main Content */}
+            {/* Main Content (Feed + Recommendations) */}
             <div className="lg:col-span-2 space-y-10">
+              {/* Activity Feed */}
               <section>
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-white">Recommended for You</h2>
+                  <h2 className="text-2xl font-bold text-white">Activity Feed</h2>
+                </div>
+                <Feed />
+              </section>
+
+              {/* Recommended Events */}
+              <section className="pt-8 border-t border-white/10">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold text-white">Recommended Events</h2>
                   <a href="/student/events" className="text-indigo-400 hover:text-indigo-300 text-sm font-medium flex items-center gap-1">
                     View All <ArrowRight size={16} />
                   </a>
@@ -111,7 +144,9 @@ export default function StudentDashboard() {
                   ))}
                   {events.length === 0 && !loading && (
                      <div className="col-span-2 glass p-10 text-center rounded-3xl border border-white/5">
-                        <p className="text-slate-400">No upcoming events found. Check back later!</p>
+                        <h3 className="text-xl font-bold text-white mb-2">It's a little quiet here...</h3>
+                        <p className="text-slate-400 mb-4">No upcoming events found right now, but every great journey starts with a single step!</p>
+                        <p className="text-indigo-400 text-sm font-medium italic">"The future belongs to those who prepare for it today."</p>
                      </div>
                   )}
                 </div>
@@ -155,7 +190,7 @@ export default function StudentDashboard() {
             onSubmit={handlePaymentSubmit}
           />
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

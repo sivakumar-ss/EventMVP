@@ -4,6 +4,9 @@ import com.eventapp.dto.EventRequest;
 import com.eventapp.dto.EventResponse;
 import com.eventapp.dto.ParticipantResponse;
 import com.eventapp.dto.RegistrationRequest;
+import com.eventapp.dto.ReportResponse;
+import com.eventapp.dto.MonthlyTrendDTO;
+import com.eventapp.dto.EventParticipationDTO;
 import com.eventapp.entity.*;
 import com.eventapp.repository.EventRepository;
 import com.eventapp.repository.RegistrationRepository;
@@ -15,6 +18,21 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.time.Month;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.pdf.PdfContentByte;
+import java.io.ByteArrayOutputStream;
 
 @Service
 @RequiredArgsConstructor
@@ -22,8 +40,9 @@ import java.util.stream.Collectors;
 public class EventService {
 
     private final EventRepository eventRepository;
-    private final UserRepository userRepository;
     private final RegistrationRepository registrationRepository;
+    private final UserRepository userRepository;
+    private final NotificationService notificationService;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
@@ -42,6 +61,7 @@ public class EventService {
                 .admin(admin)
                 .image(request.getImage() != null ? request.getImage() : "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800&q=80")
                 .paymentScanner(request.getPaymentScanner() != null ? request.getPaymentScanner() : "https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg")
+                .fee(request.getFee() != null ? request.getFee() : 0.0)
                 .build();
 
         Event savedEvent = eventRepository.save(event);
@@ -82,8 +102,9 @@ public class EventService {
 
         int maxParticipants = event.getMaxParticipants() != null ? event.getMaxParticipants() : 0;
         int currentCount = registrationRepository.findByEvent(event).size();
+        RegistrationStatus initialStatus = RegistrationStatus.PENDING;
         if (maxParticipants > 0 && currentCount >= maxParticipants) {
-             throw new RuntimeException("Event is already full");
+             initialStatus = RegistrationStatus.WAITLISTED;
         }
 
         if (registrationRepository.existsByStudentAndEvent(student, event)) {
@@ -95,10 +116,16 @@ public class EventService {
                 .event(event)
                 .utrNumber(request.getUtrNumber())
                 .paymentScreenshot(request.getPaymentScreenshot())
-                .status(RegistrationStatus.PENDING)
+                .status(initialStatus)
                 .build();
 
         registrationRepository.save(registration);
+
+        notificationService.createNotification(
+                event.getAdmin(),
+                "New registration from " + student.getName() + " for event: " + event.getTitle(),
+                "INFO"
+        );
     }
 
     public List<EventResponse> getStudentRegistrations(String studentEmail) {
@@ -117,28 +144,94 @@ public class EventService {
                 .collect(Collectors.toList());
     }
 
-    public String claimCertificate(Long registrationId, String studentEmail) {
+    public byte[] claimCertificatePdf(Long registrationId, String studentEmail) {
         Registration registration = registrationRepository.findById(registrationId)
                 .orElseThrow(() -> new RuntimeException("Registration not found"));
 
         if (!registration.getStudent().getEmail().equals(studentEmail)) {
-            throw new RuntimeException("Not authorized to claim this certificate");
+            throw new RuntimeException("Unauthorized");
+        }
+        if (!registration.isCertificateGranted()) {
+            throw new RuntimeException("Certificate not granted yet");
         }
 
-        if (registration.getStatus() != RegistrationStatus.VERIFIED) {
-            throw new RuntimeException("Certificate only available for verified registrations");
+        if (!registration.isCertificateClaimed()) {
+            registration.setCertificateClaimed(true);
+            registrationRepository.save(registration);
         }
 
-        if (registration.isCertificateClaimed()) {
-            return "Certificate already claimed. Points were previously awarded.";
+        try {
+            Document document = new Document(PageSize.A4.rotate());
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            PdfWriter writer = PdfWriter.getInstance(document, out);
+            document.open();
+            
+            // Draw Border
+            PdfContentByte canvas = writer.getDirectContent();
+            canvas.setLineWidth(3f);
+            canvas.setColorStroke(BaseColor.DARK_GRAY);
+            canvas.rectangle(20, 20, PageSize.A4.getHeight() - 40, PageSize.A4.getWidth() - 40);
+            canvas.stroke();
+            
+            canvas.setLineWidth(1f);
+            canvas.setColorStroke(BaseColor.GRAY);
+            canvas.rectangle(25, 25, PageSize.A4.getHeight() - 50, PageSize.A4.getWidth() - 50);
+            canvas.stroke();
+
+            // Fonts
+            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 36, BaseColor.DARK_GRAY);
+            Font subTitleFont = FontFactory.getFont(FontFactory.HELVETICA, 18, BaseColor.GRAY);
+            Font nameFont = FontFactory.getFont(FontFactory.TIMES_BOLDITALIC, 32, BaseColor.BLACK);
+            Font normalFont = FontFactory.getFont(FontFactory.HELVETICA, 14, BaseColor.BLACK);
+            Font dateFont = FontFactory.getFont(FontFactory.HELVETICA_OBLIQUE, 12, BaseColor.GRAY);
+
+            // Content
+            document.add(new Paragraph("\n\n\n")); // Spacing
+
+            Paragraph title = new Paragraph("CERTIFICATE OF PARTICIPATION", titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            document.add(title);
+
+            document.add(new Paragraph("\n"));
+
+            Paragraph subTitle = new Paragraph("PROUDLY PRESENTED BY NEXUSEVENTS TO", subTitleFont);
+            subTitle.setAlignment(Element.ALIGN_CENTER);
+            document.add(subTitle);
+
+            document.add(new Paragraph("\n\n"));
+
+            Paragraph name = new Paragraph(registration.getStudent().getName().toUpperCase(), nameFont);
+            name.setAlignment(Element.ALIGN_CENTER);
+            document.add(name);
+
+            document.add(new Paragraph("\n"));
+
+            Paragraph description = new Paragraph("for successfully participating and demonstrating excellent skills in", normalFont);
+            description.setAlignment(Element.ALIGN_CENTER);
+            document.add(description);
+
+            document.add(new Paragraph("\n"));
+
+            Paragraph eventName = new Paragraph(registration.getEvent().getTitle(), FontFactory.getFont(FontFactory.HELVETICA_BOLD, 22, BaseColor.BLACK));
+            eventName.setAlignment(Element.ALIGN_CENTER);
+            document.add(eventName);
+
+            document.add(new Paragraph("\n\n"));
+
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("MMM dd, yyyy");
+            String formattedDate = registration.getEvent().getEventDate() != null 
+                    ? registration.getEvent().getEventDate().format(formatter) 
+                    : "TBD";
+            Paragraph date = new Paragraph("Date of Event: " + formattedDate, dateFont);
+            date.setAlignment(Element.ALIGN_CENTER);
+            document.add(date);
+
+            document.close();
+            return out.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to generate PDF", e);
         }
-
-        registration.setCertificateClaimed(true);
-        registrationRepository.save(registration);
-
-        String category = registration.getEvent().getCategory();
-        int points = "Technical".equalsIgnoreCase(category) ? 10 : 5;
-        return "+" + points + " points awarded for claiming your certificate!";
     }
     
     public List<ParticipantResponse> getEventParticipants(Long eventId) {
@@ -170,6 +263,11 @@ public class EventService {
 
         registration.setStatus(verified ? RegistrationStatus.VERIFIED : RegistrationStatus.REJECTED);
         registrationRepository.save(registration);
+
+        String message = verified ? "Your registration for '" + registration.getEvent().getTitle() + "' was verified!" 
+                                  : "Your registration for '" + registration.getEvent().getTitle() + "' was rejected.";
+        String type = verified ? "SUCCESS" : "ALERT";
+        notificationService.createNotification(registration.getStudent(), message, type);
     }
 
     public void grantCertificate(Long registrationId, String adminEmail) {
@@ -186,6 +284,12 @@ public class EventService {
 
         registration.setCertificateGranted(true);
         registrationRepository.save(registration);
+
+        notificationService.createNotification(
+                registration.getStudent(),
+                "Your certificate for '" + registration.getEvent().getTitle() + "' is ready to download!",
+                "SUCCESS"
+        );
     }
     
     public EventResponse updateEvent(Long eventId, EventRequest request, String adminEmail) {
@@ -204,6 +308,7 @@ public class EventService {
         if (request.getMaxParticipants() != null) event.setMaxParticipants(request.getMaxParticipants());
         if (request.getImage() != null) event.setImage(request.getImage());
         if (request.getPaymentScanner() != null) event.setPaymentScanner(request.getPaymentScanner());
+        if (request.getFee() != null) event.setFee(request.getFee());
 
         eventRepository.save(event);
         return mapToResponse(event);
@@ -222,6 +327,46 @@ public class EventService {
         return mapToResponse(event);
     }
 
+    public ReportResponse getAdminReports(String adminEmail) {
+        User admin = userRepository.findByEmail(adminEmail)
+                .orElseThrow(() -> new RuntimeException("Admin not found"));
+
+        List<Event> adminEvents = eventRepository.findByAdmin(admin);
+        
+        List<EventParticipationDTO> participation = new ArrayList<>();
+        Map<String, Integer> monthlyCounts = new LinkedHashMap<>();
+        
+        // Initialize last 6 months to 0 (or all 12 months)
+        String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        for (String m : months) {
+            monthlyCounts.put(m, 0);
+        }
+
+        for (Event event : adminEvents) {
+            List<Registration> eventRegs = registrationRepository.findByEvent(event);
+            participation.add(new EventParticipationDTO(event.getTitle(), eventRegs.size()));
+            
+            for (Registration reg : eventRegs) {
+                if (reg.getRegisteredAt() != null) {
+                    Month month = reg.getRegisteredAt().getMonth();
+                    String monthName = month.name().substring(0, 3);
+                    monthName = monthName.substring(0, 1).toUpperCase() + monthName.substring(1).toLowerCase();
+                    monthlyCounts.put(monthName, monthlyCounts.getOrDefault(monthName, 0) + 1);
+                }
+            }
+        }
+        
+        List<MonthlyTrendDTO> trends = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : monthlyCounts.entrySet()) {
+            trends.add(new MonthlyTrendDTO(entry.getKey(), entry.getValue()));
+        }
+        
+        // Sort participation by value descending
+        participation.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
+
+        return new ReportResponse(trends, participation);
+    }
+
     private EventResponse mapToResponse(Event event) {
         int count = registrationRepository.findByEvent(event).size();
         return EventResponse.builder()
@@ -237,6 +382,7 @@ public class EventService {
                 .category(event.getCategory() != null ? event.getCategory() : "General")
                 .image(event.getImage())
                 .paymentScanner(event.getPaymentScanner())
+                .fee(event.getFee())
                 .maxParticipants(event.getMaxParticipants())
                 .registeredCount(count)
                 .build();

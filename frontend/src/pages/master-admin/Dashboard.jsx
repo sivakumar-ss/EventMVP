@@ -17,7 +17,7 @@ export default function MasterDashboard() {
     const fetchData = async () => {
       try {
         const [statsRes, adminsRes] = await Promise.all([
-          masterAdminApi.getStats(),
+          masterAdminApi.getDashboardStats(),
           masterAdminApi.getAdmins()
         ]);
         setStats(statsRes.data);
@@ -67,7 +67,7 @@ export default function MasterDashboard() {
               <div className="space-y-4">
                 {loading ? (
                   [...Array(3)].map((_, i) => (
-                    <div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse" />
+                    <div key={i} className="h-14 bg-white/5 rounded-xl " />
                   ))
                 ) : recentAdmins.length > 0 ? (
                   recentAdmins.map((admin) => (
@@ -109,7 +109,7 @@ export default function MasterDashboard() {
                   </div>
                   <div className="w-full h-3 bg-white/5 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full transition-all duration-1000"
+                      className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full transition-all "
                       style={{ width: `${stats.totalAdmins + stats.totalStudents > 0 ? (stats.totalAdmins / (stats.totalAdmins + stats.totalStudents)) * 100 : 0}%` }}
                     />
                   </div>
@@ -128,12 +128,30 @@ export default function MasterDashboard() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-500/5 to-orange-500/5 border border-amber-500/10">
-                  <div className="flex items-center gap-3">
-                    <Crown size={20} className="text-amber-400" />
-                    <div>
-                      <p className="text-sm font-bold text-white">Master Admin Panel</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5">Full control over all platform accounts and resources</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <a href="/master-admin/requests" className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20 transition-colors group cursor-pointer block">
+                    <div className="flex items-center gap-3 mb-2">
+                      <Shield size={18} className="text-amber-400 " />
+                      <span className="text-xs font-bold text-slate-300">Pending Admins</span>
+                    </div>
+                    <p className="text-2xl font-bold text-amber-400">{stats.pendingAdminRequests || 0}</p>
+                  </a>
+
+                  <a href="/master-admin/support" className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 transition-colors group cursor-pointer block">
+                    <div className="flex items-center gap-3 mb-2">
+                      <Activity size={18} className="text-rose-400 " />
+                      <span className="text-xs font-bold text-slate-300">Open Tickets</span>
+                    </div>
+                    <p className="text-2xl font-bold text-rose-400">{stats.openSupportTickets || 0}</p>
+                  </a>
+
+                  <div className="col-span-2 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Users size={18} className="text-emerald-400" />
+                        <span className="text-xs font-bold text-slate-300">Total Event Registrations</span>
+                      </div>
+                      <p className="text-xl font-bold text-emerald-400">{stats.totalRegistrations || 0}</p>
                     </div>
                   </div>
                 </div>

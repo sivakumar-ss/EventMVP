@@ -24,6 +24,7 @@ export default function Sidebar() {
     { icon: PlusCircle, label: 'Create Event', path: '/admin/create-event' },
     { icon: ListChecks, label: 'Manage Events', path: '/admin/events' },
     { icon: BarChart3, label: 'Reports', path: '/admin/reports' },
+    { icon: BookmarkCheck, label: 'Support', path: '/admin/support' },
   ] : [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/student/dashboard' },
     { icon: Calendar, label: 'Browse Events', path: '/student/events' },
@@ -36,10 +37,10 @@ export default function Sidebar() {
     <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-slate-950 border-r border-white/5 flex-col z-40 transition-all">
       <div className="h-16 flex items-center px-8 border-b border-white/5">
          <div className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-600/20 group-hover:rotate-12 transition-transform">
+            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-600/20 group-hover:rotate-12 ">
               <Zap size={18} fill="currentColor" />
             </div>
-            <span className="text-xl font-extrabold text-white tracking-tight">EventHub</span>
+            <span className="text-xl font-extrabold text-white tracking-tight">NexusEvents</span>
           </div>
       </div>
 
@@ -51,7 +52,7 @@ export default function Sidebar() {
             to={item.path}
             className={({ isActive }) => `sidebar-link ${isActive ? 'sidebar-link-active text-white' : ''} group`}
           >
-            <item.icon size={20} className="shrink-0 group-hover:scale-110 transition-transform" />
+            <item.icon size={20} className="shrink-0 " />
             <span className="flex-1 font-medium">{item.label}</span>
             <ChevronRight size={14} className={`opacity-0 group-hover:opacity-40 transition-opacity ${isAdmin ? 'text-indigo-400' : 'text-indigo-400'}`} />
           </NavLink>
@@ -63,7 +64,7 @@ export default function Sidebar() {
                 to={isAdmin ? "/admin/settings" : "/student/profile"}
                 className={({ isActive }) => `sidebar-link ${isActive ? 'sidebar-link-active' : ''} group`}
             >
-                <Settings size={20} className="shrink-0 group-hover:rotate-45 transition-transform" />
+                <Settings size={20} className="shrink-0 group-hover:rotate-45 " />
                 <span className="flex-1 font-medium">Settings</span>
             </NavLink>
         </div>
@@ -83,7 +84,7 @@ export default function Sidebar() {
               </div>
               <button 
                   onClick={handleLogout}
-                  className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-white/5 text-rose-400 hover:bg-rose-500 hover:text-white text-xs font-bold transition-all duration-300"
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-white/5 text-rose-400 hover:bg-rose-500 hover:text-white text-xs font-bold transition-all "
               >
                   <LogOut size={14} /> Sign Out
               </button>

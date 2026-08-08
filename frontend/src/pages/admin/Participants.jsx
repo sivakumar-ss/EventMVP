@@ -70,6 +70,23 @@ export default function Participants() {
     }
   };
 
+  const handleExportCSV = async () => {
+    try {
+      toast.loading('Exporting CSV...', { id: 'csv' });
+      const res = await adminApi.exportCsv(eventId);
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `participants_${eventId}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success('CSV Exported Successfully', { id: 'csv' });
+    } catch (err) {
+      toast.error('Failed to export CSV', { id: 'csv' });
+    }
+  };
+
   return (
     <div className="flex">
       <Sidebar />
@@ -106,7 +123,7 @@ export default function Participants() {
                   <Filter size={16} /> Filters
                 </button>
                 <button
-                  onClick={() => toast.success('CSV Export Started')}
+                  onClick={handleExportCSV}
                   className="flex-1 md:flex-none btn-primary !py-2.5 !px-5 text-sm flex items-center justify-center gap-2"
                 >
                   <Download size={16} /> Export CSV
@@ -222,7 +239,7 @@ export default function Participants() {
                               title="Grant Certificate to Student"
                             >
                               {grantingId === p.registrationId
-                                ? <div className="w-3 h-3 border-2 border-yellow-400/30 border-t-yellow-400 rounded-full animate-spin" />
+                                ? <div className="w-3 h-3 border-2 border-yellow-400/30 border-t-yellow-400 rounded-full " />
                                 : <Award size={14} />}
                               Grant Certificate
                             </button>

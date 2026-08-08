@@ -15,6 +15,8 @@ export default function StudentProfile() {
     year: '3rd Year'
   });
   const [stats, setStats] = useState({ score: 0, followersCount: 0, followingCount: 0 });
+  const [adminRequestStatus, setAdminRequestStatus] = useState(null);
+  const [isRequestingAdmin, setIsRequestingAdmin] = useState(false);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -29,12 +31,42 @@ export default function StudentProfile() {
         console.error("Failed to load profile stats", err);
       }
     };
+    
+    const fetchAdminStatus = async () => {
+      try {
+        const res = await studentApi.getAdminRequestStatus();
+        if (res.status === 200 && res.data) {
+          setAdminRequestStatus(res.data);
+        }
+      } catch (err) {
+        console.error("Failed to load admin request status", err);
+      }
+    };
+
     fetchStats();
+    fetchAdminStatus();
   }, []);
 
   const handleSave = (e) => {
     e.preventDefault();
     toast.success('Profile updated successfully!');
+  };
+
+  const handleRequestAdmin = async () => {
+    if (!profile.college) {
+      toast.error('Please enter your College Name before requesting Admin access.');
+      return;
+    }
+    setIsRequestingAdmin(true);
+    try {
+      const res = await studentApi.requestAdminRole({ collegeName: profile.college });
+      setAdminRequestStatus(res.data);
+      toast.success('Admin access request submitted successfully!');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to request admin access');
+    } finally {
+      setIsRequestingAdmin(false);
+    }
   };
 
   return (
@@ -92,6 +124,40 @@ export default function StudentProfile() {
                             <span className="text-white font-bold text-sm">{stats.followingCount}</span>
                         </div>
                     </div>
+                </div>
+
+                {/* Become Admin Section */}
+                <div className="glass p-6 rounded-3xl border border-white/5 bg-gradient-to-br from-indigo-500/5 to-purple-600/5">
+                    <h3 className="text-white font-bold mb-2 text-sm flex items-center gap-2">
+                      <Shield size={16} className="text-indigo-400" /> Become an Admin
+                    </h3>
+                    <p className="text-xs text-slate-400 mb-4">Want to host events for your college? Request an admin account.</p>
+                    
+                    {adminRequestStatus ? (
+                      <div className={`p-3 rounded-xl border text-xs font-bold flex flex-col gap-1 ${
+                        adminRequestStatus.status === 'APPROVED' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
+                        adminRequestStatus.status === 'REJECTED' ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' :
+                        'bg-amber-500/10 border-amber-500/20 text-amber-400'
+                      }`}>
+                        <span className="uppercase tracking-wider">Status: {adminRequestStatus.status}</span>
+                        {adminRequestStatus.status === 'PENDING' && (
+                          <span className="text-[10px] text-amber-400/70 font-medium">Waiting for Master Admin approval.</span>
+                        )}
+                        {adminRequestStatus.status === 'REJECTED' && (
+                          <button onClick={handleRequestAdmin} disabled={isRequestingAdmin} className="mt-2 py-1.5 px-3 bg-white/5 rounded-lg text-white hover:bg-white/10 transition-colors">
+                            Request Again
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <button 
+                        onClick={handleRequestAdmin}
+                        disabled={isRequestingAdmin}
+                        className={`w-full py-2.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 text-indigo-300 font-bold text-xs hover:bg-indigo-500/20 hover:text-white transition-all ${isRequestingAdmin ? 'opacity-50' : ''}`}
+                      >
+                        {isRequestingAdmin ? 'Submitting...' : 'Request Admin Access'}
+                      </button>
+                    )}
                 </div>
             </div>
 

@@ -4,7 +4,7 @@ import { adminApi } from '../../services/api';
 import Sidebar from '../../components/Sidebar';
 import { 
   Plus, Calendar, MapPin, AlignLeft, 
-  Image as ImageIcon, Users, Tag, Save, X, QrCode 
+  Image as ImageIcon, Users, Tag, Save, X, QrCode, UploadCloud 
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -19,6 +19,7 @@ export default function CreateEvent() {
     venue: '',
     category: 'Technical',
     maxParticipants: 100,
+    fee: 0,
     image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&q=80',
     paymentScanner: 'https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg'
   });
@@ -35,6 +36,7 @@ export default function CreateEvent() {
         eventDate: new Date(`${formData.date}T${formData.time}:00`).toISOString(),
         category: formData.category,
         maxParticipants: formData.maxParticipants,
+        fee: parseFloat(formData.fee) || 0,
         image: formData.image,
         paymentScanner: formData.paymentScanner
       };
@@ -144,7 +146,7 @@ export default function CreateEvent() {
                 </div>
 
                 {/* Settings */}
-                <div className="grid md:grid-cols-2 gap-8 pt-6 border-t border-white/5">
+                <div className="grid md:grid-cols-3 gap-8 pt-6 border-t border-white/5">
                     <div className="space-y-4">
                         <h3 className="text-lg font-bold text-white flex items-center gap-2">
                             <Users className="text-indigo-400" size={18} /> Capacity
@@ -162,7 +164,24 @@ export default function CreateEvent() {
                     </div>
                     <div className="space-y-4">
                         <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                            <Plus className="text-indigo-400" size={18} /> Category
+                            <Plus className="text-indigo-400" size={18} /> Fee (₹)
+                        </h3>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase">Registration Fee</label>
+                            <input 
+                                required
+                                type="number" 
+                                min="0"
+                                step="0.01"
+                                className="input-field" 
+                                value={formData.fee}
+                                onChange={e => setFormData({...formData, fee: e.target.value})}
+                            />
+                        </div>
+                    </div>
+                    <div className="space-y-4">
+                        <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                            <Tag className="text-indigo-400" size={18} /> Category
                         </h3>
                         <div className="space-y-2">
                             <label className="text-[10px] font-bold text-slate-500 uppercase">Event Type</label>
@@ -186,50 +205,44 @@ export default function CreateEvent() {
                      <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
                         <ImageIcon className="text-indigo-400" size={18} /> Event Banner
                     </h3>
-                    <div className="flex items-center gap-6">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
                         <div className="w-40 h-24 rounded-2xl overflow-hidden glass border border-white/10 shrink-0">
                             <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
                         </div>
-                        <div className="flex-1 space-y-2">
-                             <input 
-                                type="text" 
-                                placeholder="Paste image URL here..."
-                                className="input-field" 
-                                value={formData.image}
-                                onChange={e => setFormData({...formData, image: e.target.value})}
-                             />
-                             <p className="text-[10px] text-slate-500">Image should be at least 1200x600 for best results.</p>
+                        <div className="flex-1 space-y-3 w-full">
+                             <div className="flex items-center gap-2">
+                               <input 
+                                  type="text" 
+                                  placeholder="Paste image URL or click upload..."
+                                  className="input-field flex-1" 
+                                  value={formData.image}
+                                  onChange={e => setFormData({...formData, image: e.target.value})}
+                               />
+                               <button 
+                                  type="button"
+                                  onClick={() => {
+                                      toast.loading('Simulating Cloud Upload...', { id: 'upload' });
+                                      setTimeout(() => {
+                                          setFormData({...formData, image: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=1200&q=80'});
+                                          toast.success('Uploaded to mock AWS S3!', { id: 'upload' });
+                                      }, 1500);
+                                  }}
+                                  className="btn-secondary !py-3 flex items-center gap-2 shrink-0"
+                               >
+                                  <UploadCloud size={16} /> Upload
+                               </button>
+                             </div>
+                             <p className="text-[10px] text-slate-500">Upload to our mock cloud storage or paste a direct URL. Recommended size: 1200x600.</p>
                         </div>
                     </div>
                 </div>
 
-                {/* Payment QR Code */}
-                <div className="pt-6 border-t border-white/5">
-                     <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
-                        <QrCode className="text-indigo-400" size={18} /> Payment UPI Scanner
-                    </h3>
-                    <div className="flex items-center gap-6">
-                        <div className="w-24 h-24 p-2 rounded-2xl overflow-hidden bg-white shrink-0">
-                            <img src={formData.paymentScanner} alt="QR Preview" className="w-full h-full object-contain" />
-                        </div>
-                        <div className="flex-1 space-y-2">
-                             <input 
-                                type="text" 
-                                placeholder="Paste Payment QR Image URL here..."
-                                className="input-field" 
-                                value={formData.paymentScanner}
-                                onChange={e => setFormData({...formData, paymentScanner: e.target.value})}
-                             />
-                             <p className="text-[10px] text-slate-500">Students will scan this QR code to pay for registration.</p>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <div className="flex justify-end gap-4">
                 <button type="button" onClick={() => navigate('/admin/events')} className="btn-secondary">Cancel</button>
                 <button type="submit" disabled={loading} className="btn-primary flex items-center gap-2 min-w-[160px] justify-center">
-                    {loading ? <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <><Save size={18} /> Publish Event</>}
+                    {loading ? <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full " /> : <><Save size={18} /> Publish Event</>}
                 </button>
             </div>
           </form>

@@ -271,7 +271,7 @@ export default function MyEvents() {
   const [loading, setLoading] = useState(true);
   const [entryCardReg, setEntryCardReg] = useState(null);
   const [certificateReg, setCertificateReg] = useState(null);
-  const [claiming, setClaiming] = useState(null);
+  const [claimingIds, setClaimingIds] = useState(new Set());
 
   const fetchMyEvents = async () => {
     try {
@@ -287,22 +287,41 @@ export default function MyEvents() {
   useEffect(() => { fetchMyEvents(); }, []);
 
   const handleClaimCertificate = async (reg) => {
-    if (!reg.certificateClaimed) {
-      setClaiming(reg.registrationId);
-      try {
-        const res = await studentApi.claimCertificate(reg.registrationId);
-        toast.success(res.data, { icon: '🏆', duration: 4000 });
-        await fetchMyEvents();
-      } catch (err) {
-        toast.error(err?.response?.data || 'Failed to claim certificate');
-        setClaiming(null);
-        return;
+    try {
+      setClaimingIds(prev => new Set(prev).add(reg.registrationId));
+      const res = await studentApi.claimCertificate(reg.registrationId);
+      
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `certificate_${reg.registrationId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      
+      toast.success("Certificate downloaded! You earned 50 points.");
+      
+      setRegistrations(prev => prev.map(r => 
+        r.registrationId === reg.registrationId ? { ...r, certificateClaimed: true } : r
+      ));
+    } catch (err) {
+      console.error("Certificate Claim Error:", err);
+      // When responseType is 'blob', err.response.data is a Blob. We need to read it to get the string.
+      if (err.response && err.response.data instanceof Blob) {
+          const text = await err.response.data.text();
+          toast.error(text || 'Failed to claim certificate');
+      } else {
+          toast.error(err.response?.data?.message || err.message || 'Failed to claim certificate');
       }
-      setClaiming(null);
+    } finally {
+      setClaimingIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(reg.registrationId);
+        return newSet;
+      });
     }
-    setCertificateReg(reg);
   };
-
+  
   const getPointsLabel = (reg) => {
     if (!reg.category) return '5 pts';
     return reg.category.toLowerCase() === 'technical' ? '10 pts' : '5 pts';
@@ -327,7 +346,7 @@ export default function MyEvents() {
           {loading ? (
             <div className="space-y-4">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-40 glass rounded-3xl animate-pulse bg-white/5" />
+                <div key={i} className="h-40 glass rounded-3xl bg-white/5" />
               ))}
             </div>
           ) : registrations.length > 0 ? (
@@ -336,7 +355,7 @@ export default function MyEvents() {
                 const regStatus = reg.registrationStatus || 'PENDING';
                 const isVerified = regStatus === 'VERIFIED';
                 const isRejected = regStatus === 'REJECTED';
-                const isClaiming = claiming === reg.registrationId;
+                const isClaiming = claimingIds.has(reg.registrationId);
                 const cfg = statusConfig[regStatus] || statusConfig.PENDING;
                 const certGranted = reg.certificateGranted;
                 const certClaimed = reg.certificateClaimed;
@@ -352,7 +371,7 @@ export default function MyEvents() {
                       <img
                         src={reg.image || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80'}
                         alt={reg.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-cover "
                       />
                     </div>
 
@@ -425,7 +444,7 @@ export default function MyEvents() {
                           className={`w-full flex items-center justify-center gap-2 btn-primary !py-2.5 !px-5 text-sm transition-all ${isClaiming ? 'opacity-60 cursor-not-allowed' : ''}`}
                         >
                           {isClaiming
-                            ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Claiming...</>
+                            ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full " /> Claiming...</>
                             : certClaimed
                               ? <><Download size={16} /> Download Certificate</>
                               : <><Award size={16} /> Get Certificate & Points</>

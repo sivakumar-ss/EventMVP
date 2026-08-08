@@ -1,16 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '../../components/Sidebar';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell
 } from 'recharts';
-import { chartData, participationByEvent } from '../../data/mockData';
+import { adminApi } from '../../services/api';
 import { Download, Filter, FileText, Zap } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const COLORS = ['#6366f1', '#06b6d4', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'];
 
 export default function Reports() {
+  const [chartData, setChartData] = useState([]);
+  const [participationByEvent, setParticipationByEvent] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        const res = await adminApi.getReports();
+        setChartData(res.data.monthlyTrends);
+        setParticipationByEvent(res.data.participationByEvent);
+      } catch (err) {
+        toast.error('Failed to load report data');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchReports();
+  }, []);
+
   const handleExport = () => {
     toast.success('Report exported to PDF successfully!');
   };
@@ -30,7 +50,19 @@ export default function Reports() {
             </button>
           </header>
 
-          <div className="grid lg:grid-cols-2 gap-8 mb-10">
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+                <div className="w-8 h-8 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+            </div>
+          ) : chartData.length === 0 && participationByEvent.length === 0 ? (
+            <div className="text-center py-20 glass rounded-3xl border border-white/5">
+                <FileText className="mx-auto text-slate-500 mb-4" size={48} />
+                <h3 className="text-xl font-bold text-white mb-2">No Data Available</h3>
+                <p className="text-slate-400">You don't have any event registrations yet.</p>
+            </div>
+          ) : (
+            <>
+              <div className="grid lg:grid-cols-2 gap-8 mb-10">
             {/* Monthly Trend */}
             <div className="glass p-8 rounded-3xl border border-white/5">
                 <div className="flex items-center justify-between mb-8">
@@ -105,14 +137,16 @@ export default function Reports() {
                             </div>
                             <div className="h-2 bg-white/5 rounded-full overflow-hidden">
                                 <div 
-                                    className="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full transition-all duration-1000"
-                                    style={{ width: `${(event.value / 400) * 100}%` }}
+                                    className="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full "
+                                    style={{ width: `${Math.min(100, (event.value / Math.max(1, participationByEvent[0]?.value || 1)) * 100)}%` }}
                                 />
                             </div>
                         </div>
                     ))}
                 </div>
           </div>
+          </>
+          )}
         </div>
       </div>
     </div>

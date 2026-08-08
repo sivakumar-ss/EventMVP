@@ -6,6 +6,9 @@ import com.eventapp.entity.Event;
 import com.eventapp.repository.EventRepository;
 import com.eventapp.repository.RegistrationRepository;
 import com.eventapp.repository.UserRepository;
+import com.eventapp.repository.NotificationRepository;
+import com.eventapp.repository.SupportTicketRepository;
+import com.eventapp.repository.AdminVerificationRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +22,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final RegistrationRepository registrationRepository;
     private final EventRepository eventRepository;
+    private final NotificationRepository notificationRepository;
+    private final SupportTicketRepository supportTicketRepository;
+    private final AdminVerificationRequestRepository adminVerificationRequestRepository;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -58,7 +64,12 @@ public class UserService {
             eventRepository.deleteAll(eventRepository.findByAdmin(user));
         }
 
-        // 4. Finally delete the user record itself
+        // 4. Delete notifications, support tickets, and admin requests
+        notificationRepository.deleteByUser(user);
+        supportTicketRepository.deleteByAdmin(user);
+        adminVerificationRequestRepository.deleteByUser(user);
+
+        // 5. Finally delete the user record itself
         userRepository.deleteById(id);
     }
 

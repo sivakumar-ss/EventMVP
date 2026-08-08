@@ -1,4 +1,7 @@
-export function StatCard({ icon: Icon, label, value, sub, color = 'indigo', trend }) {
+import { motion } from 'framer-motion';
+import CountUp from 'react-countup';
+
+export function StatCard({ icon: Icon, label, value, sub, color = 'indigo', trend, prefix = '' }) {
   const colorMap = {
     indigo: 'from-indigo-500 to-indigo-600 shadow-indigo-500/20',
     purple: 'from-purple-500 to-purple-600 shadow-purple-500/20',
@@ -8,8 +11,13 @@ export function StatCard({ icon: Icon, label, value, sub, color = 'indigo', tren
     rose: 'from-rose-500 to-rose-600 shadow-rose-500/20',
   };
 
+  const isNumber = typeof value === 'number';
+
   return (
-    <div className="stat-card">
+    <motion.div 
+      className="stat-card"
+      whileHover={{ y: -5, transition: { duration: 0.2 } }}
+    >
       <div className="flex items-start justify-between mb-4">
         <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${colorMap[color]} flex items-center justify-center shadow-lg`}>
           <Icon size={20} className="text-white" />
@@ -20,10 +28,12 @@ export function StatCard({ icon: Icon, label, value, sub, color = 'indigo', tren
           </span>
         )}
       </div>
-      <p className="text-3xl font-bold text-white mb-1">{value}</p>
+      <p className="text-3xl font-bold text-white mb-1">
+        {prefix}{value}
+      </p>
       <p className="text-slate-400 text-sm font-medium">{label}</p>
       {sub && <p className="text-slate-500 text-xs mt-1">{sub}</p>}
-    </div>
+    </motion.div>
   );
 }
 

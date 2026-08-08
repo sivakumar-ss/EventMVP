@@ -63,7 +63,7 @@ export default function AdminSettings() {
             <div className="flex-1">
                 <div className="glass p-8 rounded-3xl border border-white/5 min-h-[500px]">
                     {activeTab === 'profile' && (
-                        <div className="space-y-8 animate-in fade-in duration-500">
+                        <div className="space-y-8 ">
                             <div className="flex items-center gap-6 pb-8 border-b border-white/5">
                                 <div className="relative">
                                     <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-4xl font-bold">
@@ -127,7 +127,7 @@ export default function AdminSettings() {
                     )}
 
                     {activeTab === 'security' && (
-                        <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
+                        <div className="space-y-8 ">
                             <div>
                                 <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
                                     <Lock size={20} className="text-indigo-400" /> Password Management
@@ -151,20 +151,20 @@ export default function AdminSettings() {
                     )}
 
                     {activeTab === 'system' && (
-                        <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
+                        <div className="space-y-8 ">
                             <div className="p-6 rounded-2xl bg-indigo-500/5 border border-indigo-500/10">
                                 <h3 className="text-white font-bold mb-4">System Status</h3>
                                 <div className="space-y-4">
                                     <div className="flex justify-between items-center bg-white/5 p-4 rounded-xl">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                            <div className="w-2 h-2 rounded-full bg-emerald-500 " />
                                             <span className="text-sm text-slate-300">Backend API</span>
                                         </div>
                                         <span className="text-[10px] font-bold text-emerald-500 uppercase">Operational</span>
                                     </div>
                                     <div className="flex justify-between items-center bg-white/5 p-4 rounded-xl">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                            <div className="w-2 h-2 rounded-full bg-emerald-500 " />
                                             <span className="text-sm text-slate-300">Database Cluster</span>
                                         </div>
                                         <span className="text-[10px] font-bold text-emerald-500 uppercase">Operational</span>

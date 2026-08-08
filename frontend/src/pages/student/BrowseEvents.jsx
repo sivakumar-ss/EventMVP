@@ -106,7 +106,7 @@ export default function BrowseEvents() {
           {loading ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="glass rounded-2xl h-80 animate-pulse bg-white/5" />
+                <div key={i} className="glass rounded-2xl h-80 bg-white/5" />
               ))}
             </div>
           ) : (

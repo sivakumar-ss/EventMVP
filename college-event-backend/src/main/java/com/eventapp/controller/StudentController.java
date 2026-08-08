@@ -2,6 +2,12 @@ package com.eventapp.controller;
 
 import com.eventapp.dto.EventResponse;
 import com.eventapp.dto.StudentNetworkResponse;
+import com.eventapp.dto.AdminRequestPayload;
+import com.eventapp.dto.AdminRequestResponse;
+import com.eventapp.dto.RegistrationRequest;
+import com.eventapp.entity.User;
+import com.eventapp.repository.UserRepository;
+import com.eventapp.service.AdminVerificationService;
 import com.eventapp.service.EventService;
 import com.eventapp.service.StudentNetworkService;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +25,13 @@ public class StudentController {
 
     private final EventService eventService;
     private final StudentNetworkService studentNetworkService;
+    private final AdminVerificationService adminVerificationService;
+    private final UserRepository userRepository;
 
     @PostMapping("/events/{eventId}/register")
     public ResponseEntity<String> registerForEvent(
             @PathVariable Long eventId, 
-            @RequestBody com.eventapp.dto.RegistrationRequest request, 
+            @RequestBody RegistrationRequest request, 
             Authentication authentication) {
         String studentEmail = authentication.getName();
         eventService.registerForEvent(eventId, studentEmail, request);
@@ -80,13 +88,32 @@ public class StudentController {
         return ResponseEntity.ok(studentNetworkService.getNetworkSummary(currentEmail));
     }
 
-    @PostMapping("/registrations/{registrationId}/claim-certificate")
-    public ResponseEntity<String> claimCertificate(
+    @PostMapping(value = "/registrations/{registrationId}/claim-certificate", produces = "application/pdf")
+    public ResponseEntity<byte[]> claimCertificate(
             @PathVariable Long registrationId,
             Authentication authentication) {
         String studentEmail = authentication.getName();
-        String message = eventService.claimCertificate(registrationId, studentEmail);
-        return ResponseEntity.ok(message);
+        byte[] pdfBytes = eventService.claimCertificatePdf(registrationId, studentEmail);
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=\"certificate_" + registrationId + ".pdf\"")
+                .body(pdfBytes);
+    }
+
+    @PostMapping("/request-admin")
+    public ResponseEntity<AdminRequestResponse> requestAdminRole(
+            @RequestBody AdminRequestPayload payload,
+            Authentication authentication) {
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return ResponseEntity.ok(adminVerificationService.createRequest(user, payload.getCollegeName()));
+    }
+
+    @GetMapping("/admin-request-status")
+    public ResponseEntity<AdminRequestResponse> getAdminRequestStatus(Authentication authentication) {
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        AdminRequestResponse status = adminVerificationService.getMyRequestStatus(user);
+        return status != null ? ResponseEntity.ok(status) : ResponseEntity.noContent().build();
     }
 }
 

@@ -110,7 +110,7 @@ export default function StudentNetwork() {
             <h1 className="text-4xl font-bold text-white mb-2">
               My <span className="gradient-text">Network</span>
             </h1>
-            <p className="text-gray-600">
+            <p className="text-slate-400">
               Build your campus circle, follow fellow students, and see what events they're exploring.
             </p>
           </header>
@@ -119,8 +119,8 @@ export default function StudentNetwork() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <div className="stat-card flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm font-medium">Followers</p>
-                <h3 className="text-3xl font-extrabold text-gray-900 mt-1">{summary.followersCount}</h3>
+                <p className="text-slate-400 text-sm font-medium">Followers</p>
+                <h3 className="text-3xl font-extrabold text-white mt-1">{summary.followersCount}</h3>
               </div>
               <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-600">
                 <Users size={24} />
@@ -129,8 +129,8 @@ export default function StudentNetwork() {
 
             <div className="stat-card flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm font-medium">Following</p>
-                <h3 className="text-3xl font-extrabold text-gray-900 mt-1">{summary.followingCount}</h3>
+                <p className="text-slate-400 text-sm font-medium">Following</p>
+                <h3 className="text-3xl font-extrabold text-white mt-1">{summary.followingCount}</h3>
               </div>
               <div className="w-12 h-12 rounded-2xl bg-indigo-100 flex items-center justify-center text-indigo-600">
                 <UserPlus size={24} />
@@ -139,7 +139,7 @@ export default function StudentNetwork() {
 
             <div className="stat-card flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm font-medium">My Points Score</p>
+                <p className="text-slate-400 text-sm font-medium">My Points Score</p>
                 <h3 className="text-3xl font-extrabold text-amber-600 mt-1">
                   {summary.score || 0} <span className="text-sm font-bold text-slate-500 uppercase">pts</span>
                 </h3>
@@ -151,11 +151,11 @@ export default function StudentNetwork() {
           </div>
 
           {/* Tab Selection */}
-          <div className="flex border-b border-gray-300 mb-8 gap-6 overflow-x-auto scrollbar-hide">
+          <div className="flex border-b border-white/10 mb-8 gap-6 overflow-x-auto scrollbar-hide">
             <button
               onClick={() => setActiveTab('explore')}
               className={`pb-4 text-sm font-bold tracking-wide transition-all relative whitespace-nowrap ${
-                activeTab === 'explore' ? 'text-gray-900' : 'text-gray-600 hover:text-gray-900'
+                activeTab === 'explore' ? 'text-white' : 'text-slate-400 hover:text-white'
               }`}
             >
               Explore Students
@@ -166,7 +166,7 @@ export default function StudentNetwork() {
             <button
               onClick={() => setActiveTab('following')}
               className={`pb-4 text-sm font-bold tracking-wide transition-all relative whitespace-nowrap ${
-                activeTab === 'following' ? 'text-gray-900' : 'text-gray-600 hover:text-gray-900'
+                activeTab === 'following' ? 'text-white' : 'text-slate-400 hover:text-white'
               }`}
             >
               Following ({summary.followingCount})
@@ -177,7 +177,7 @@ export default function StudentNetwork() {
             <button
               onClick={() => setActiveTab('followers')}
               className={`pb-4 text-sm font-bold tracking-wide transition-all relative whitespace-nowrap ${
-                activeTab === 'followers' ? 'text-gray-900' : 'text-gray-600 hover:text-gray-900'
+                activeTab === 'followers' ? 'text-white' : 'text-slate-400 hover:text-white'
               }`}
             >
               Followers ({summary.followersCount})
@@ -188,7 +188,7 @@ export default function StudentNetwork() {
             <button
               onClick={() => setActiveTab('leaderboard')}
               className={`pb-4 text-sm font-bold tracking-wide transition-all relative whitespace-nowrap ${
-                activeTab === 'leaderboard' ? 'text-gray-900' : 'text-gray-600 hover:text-gray-900'
+                activeTab === 'leaderboard' ? 'text-white' : 'text-slate-400 hover:text-white'
               }`}
             >
               Leaderboard 🏆
@@ -224,7 +224,7 @@ export default function StudentNetwork() {
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3].map((n) => (
-                <div key={n} className="glass rounded-3xl p-6 border border-gray-300 space-y-4">
+                <div key={n} className="glass rounded-3xl p-6 border border-white/10 space-y-4">
                   <div className="flex gap-4">
                     <div className="w-12 h-12 rounded-2xl skeleton" />
                     <div className="flex-1 space-y-2">
@@ -239,12 +239,12 @@ export default function StudentNetwork() {
           ) : (
             <>
               {/* Content Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-300">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
                 {activeTab === 'explore' &&
                   students.map((student) => (
                     <div
                       key={student.id}
-                      className="glass rounded-3xl p-6 border border-gray-300 flex flex-col justify-between hover:border-indigo-400 transition-all duration-300"
+                      className="glass rounded-3xl p-6 border border-white/10 flex flex-col justify-between hover:border-indigo-400 transition-all "
                     >
                       <div>
                         <div className="flex items-start gap-4 mb-4">
@@ -252,10 +252,10 @@ export default function StudentNetwork() {
                             {student.name?.[0]?.toUpperCase()}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-base font-bold text-gray-900 truncate">{student.name}</h4>
-                            <p className="text-gray-600 text-xs truncate mt-0.5">{student.email}</p>
+                            <h4 className="text-base font-bold text-white truncate">{student.name}</h4>
+                            <p className="text-slate-400 text-xs truncate mt-0.5">{student.email}</p>
                             {student.collegeName && (
-                              <p className="text-gray-600 text-[10px] truncate mt-1 uppercase font-semibold tracking-wider">
+                              <p className="text-slate-400 text-[10px] truncate mt-1 uppercase font-semibold tracking-wider">
                                 {student.collegeName}
                               </p>
                             )}
@@ -263,17 +263,17 @@ export default function StudentNetwork() {
                         </div>
 
                         {/* Network Stats */}
-                        <div className="flex gap-4 py-3 border-y border-gray-200 my-4">
+                        <div className="flex gap-4 py-3 border-y border-white/10 my-4">
                           <div className="text-center flex-1">
-                            <p className="text-gray-600 text-[10px] uppercase font-bold tracking-wider">Followers</p>
-                            <p className="text-sm font-extrabold text-gray-900 mt-0.5">{student.followersCount}</p>
+                            <p className="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Followers</p>
+                            <p className="text-sm font-extrabold text-white mt-0.5">{student.followersCount}</p>
                           </div>
-                          <div className="w-[1px] bg-gray-300" />
+                          <div className="w-[1px] bg-white/10" />
                           <div className="text-center flex-1">
-                            <p className="text-gray-600 text-[10px] uppercase font-bold tracking-wider">Following</p>
-                            <p className="text-sm font-extrabold text-gray-900 mt-0.5">{student.followingCount}</p>
+                            <p className="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Following</p>
+                            <p className="text-sm font-extrabold text-white mt-0.5">{student.followingCount}</p>
                           </div>
-                          <div className="w-[1px] bg-gray-300" />
+                          <div className="w-[1px] bg-white/10" />
                           <div className="text-center flex-1">
                             <p className="text-indigo-600 text-[10px] uppercase font-bold tracking-wider">Score</p>
                             <p className="text-sm font-extrabold text-indigo-600 mt-0.5">{student.score || 0} pts</p>
@@ -306,7 +306,7 @@ export default function StudentNetwork() {
                   following.map((student) => (
                     <div
                       key={student.id}
-                      className="glass rounded-3xl p-6 border border-gray-300 flex flex-col justify-between hover:border-indigo-400 transition-all duration-300"
+                      className="glass rounded-3xl p-6 border border-white/10 flex flex-col justify-between hover:border-indigo-400 transition-all "
                     >
                       <div>
                         <div className="flex items-start gap-4 mb-4">
@@ -314,10 +314,10 @@ export default function StudentNetwork() {
                             {student.name?.[0]?.toUpperCase()}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-base font-bold text-gray-900 truncate">{student.name}</h4>
-                            <p className="text-gray-600 text-xs truncate mt-0.5">{student.email}</p>
+                            <h4 className="text-base font-bold text-white truncate">{student.name}</h4>
+                            <p className="text-slate-400 text-xs truncate mt-0.5">{student.email}</p>
                             {student.collegeName && (
-                              <p className="text-gray-600 text-[10px] truncate mt-1 uppercase font-semibold tracking-wider">
+                              <p className="text-slate-400 text-[10px] truncate mt-1 uppercase font-semibold tracking-wider">
                                 {student.collegeName}
                               </p>
                             )}
@@ -325,17 +325,17 @@ export default function StudentNetwork() {
                         </div>
 
                         {/* Network Stats */}
-                        <div className="flex gap-4 py-3 border-y border-gray-200 my-4">
+                        <div className="flex gap-4 py-3 border-y border-white/10 my-4">
                           <div className="text-center flex-1">
-                            <p className="text-gray-600 text-[10px] uppercase font-bold tracking-wider">Followers</p>
-                            <p className="text-sm font-extrabold text-gray-900 mt-0.5">{student.followersCount}</p>
+                            <p className="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Followers</p>
+                            <p className="text-sm font-extrabold text-white mt-0.5">{student.followersCount}</p>
                           </div>
-                          <div className="w-[1px] bg-gray-300" />
+                          <div className="w-[1px] bg-white/10" />
                           <div className="text-center flex-1">
-                            <p className="text-gray-600 text-[10px] uppercase font-bold tracking-wider">Following</p>
-                            <p className="text-sm font-extrabold text-gray-900 mt-0.5">{student.followingCount}</p>
+                            <p className="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Following</p>
+                            <p className="text-sm font-extrabold text-white mt-0.5">{student.followingCount}</p>
                           </div>
-                          <div className="w-[1px] bg-gray-300" />
+                          <div className="w-[1px] bg-white/10" />
                           <div className="text-center flex-1">
                             <p className="text-indigo-600 text-[10px] uppercase font-bold tracking-wider">Score</p>
                             <p className="text-sm font-extrabold text-indigo-600 mt-0.5">{student.score || 0} pts</p>
@@ -356,7 +356,7 @@ export default function StudentNetwork() {
                   followers.map((student) => (
                     <div
                       key={student.id}
-                      className="glass rounded-3xl p-6 border border-gray-300 flex flex-col justify-between hover:border-indigo-400 transition-all duration-300"
+                      className="glass rounded-3xl p-6 border border-white/10 flex flex-col justify-between hover:border-indigo-400 transition-all "
                     >
                       <div>
                         <div className="flex items-start gap-4 mb-4">
@@ -364,10 +364,10 @@ export default function StudentNetwork() {
                             {student.name?.[0]?.toUpperCase()}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-base font-bold text-gray-900 truncate">{student.name}</h4>
-                            <p className="text-gray-600 text-xs truncate mt-0.5">{student.email}</p>
+                            <h4 className="text-base font-bold text-white truncate">{student.name}</h4>
+                            <p className="text-slate-400 text-xs truncate mt-0.5">{student.email}</p>
                             {student.collegeName && (
-                              <p className="text-gray-600 text-[10px] truncate mt-1 uppercase font-semibold tracking-wider">
+                              <p className="text-slate-400 text-[10px] truncate mt-1 uppercase font-semibold tracking-wider">
                                 {student.collegeName}
                               </p>
                             )}
@@ -375,17 +375,17 @@ export default function StudentNetwork() {
                         </div>
 
                         {/* Network Stats */}
-                        <div className="flex gap-4 py-3 border-y border-gray-200 my-4">
+                        <div className="flex gap-4 py-3 border-y border-white/10 my-4">
                           <div className="text-center flex-1">
-                            <p className="text-gray-600 text-[10px] uppercase font-bold tracking-wider">Followers</p>
-                            <p className="text-sm font-extrabold text-gray-900 mt-0.5">{student.followersCount}</p>
+                            <p className="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Followers</p>
+                            <p className="text-sm font-extrabold text-white mt-0.5">{student.followersCount}</p>
                           </div>
-                          <div className="w-[1px] bg-gray-300" />
+                          <div className="w-[1px] bg-white/10" />
                           <div className="text-center flex-1">
-                            <p className="text-gray-600 text-[10px] uppercase font-bold tracking-wider">Following</p>
-                            <p className="text-sm font-extrabold text-gray-900 mt-0.5">{student.followingCount}</p>
+                            <p className="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Following</p>
+                            <p className="text-sm font-extrabold text-white mt-0.5">{student.followingCount}</p>
                           </div>
-                          <div className="w-[1px] bg-gray-300" />
+                          <div className="w-[1px] bg-white/10" />
                           <div className="text-center flex-1">
                             <p className="text-indigo-600 text-[10px] uppercase font-bold tracking-wider">Score</p>
                             <p className="text-sm font-extrabold text-indigo-600 mt-0.5">{student.score || 0} pts</p>
@@ -414,11 +414,11 @@ export default function StudentNetwork() {
 
               {/* Leaderboard View */}
               {activeTab === 'leaderboard' && getLeaderboardData().length > 0 && (
-                <div className="w-full max-w-2xl mx-auto space-y-4 animate-in fade-in duration-300">
-                  <div className="glass rounded-3xl p-6 border border-gray-300 shadow-2xl">
+                <div className="w-full max-w-2xl mx-auto space-y-4 ">
+                  <div className="glass rounded-3xl p-6 border border-white/10 shadow-2xl">
                     <div className="flex items-center gap-3 mb-6">
                       <Trophy className="text-amber-500" size={24} />
-                      <h3 className="text-xl font-bold text-gray-900">Following Leaderboard</h3>
+                      <h3 className="text-xl font-bold text-white">Following Leaderboard</h3>
                     </div>
                     <div className="space-y-3">
                       {getLeaderboardData().map((student, index) => {
@@ -439,21 +439,21 @@ export default function StudentNetwork() {
                         return (
                           <div
                             key={student.isCurrentUser ? 'me' : student.id}
-                            className={`flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${
+                            className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${
                               student.isCurrentUser
                                 ? 'bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border-indigo-400 shadow-md shadow-indigo-500/5'
-                                : 'bg-white/5 border-gray-300 hover:border-indigo-400'
+                                : 'bg-white/5 border-white/10 hover:border-indigo-400'
                             }`}
                           >
                             <div className="flex items-center gap-4 min-w-0">
-                              <div className={`w-8 h-8 rounded-xl border flex items-center justify-center font-bold text-sm ${medalColor || 'border-gray-200 text-gray-500'}`}>
+                              <div className={`w-8 h-8 rounded-xl border flex items-center justify-center font-bold text-sm ${medalColor || 'border-white/10 text-slate-500'}`}>
                                 {rankBadge}
                               </div>
                               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white font-extrabold text-sm shadow-md">
                                 {student.name?.[0]?.toUpperCase()}
                               </div>
                               <div className="min-w-0">
-                                <h4 className="text-sm font-bold text-gray-900 truncate flex items-center gap-2">
+                                <h4 className="text-sm font-bold text-white truncate flex items-center gap-2">
                                   {student.name}
                                   {student.isCurrentUser && (
                                     <span className="text-[9px] bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
@@ -461,12 +461,12 @@ export default function StudentNetwork() {
                                     </span>
                                   )}
                                 </h4>
-                                <p className="text-gray-500 text-xs truncate">{student.collegeName || student.email}</p>
+                                <p className="text-slate-500 text-xs truncate">{student.collegeName || student.email}</p>
                               </div>
                             </div>
                             <div className="text-right">
                               <span className="text-base font-extrabold text-indigo-600">{student.score}</span>
-                              <span className="text-[10px] text-gray-500 font-bold uppercase ml-1">pts</span>
+                              <span className="text-[10px] text-slate-500 font-bold uppercase ml-1">pts</span>
                             </div>
                           </div>
                         );

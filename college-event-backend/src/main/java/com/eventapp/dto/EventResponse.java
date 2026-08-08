@@ -22,6 +22,7 @@ public class EventResponse {
     private String category;
     private String image;
     private String paymentScanner;
+    private Double fee;
     private Integer registeredCount; // Changed from participantCount
     private Integer maxParticipants;
     private String registrationStatus;

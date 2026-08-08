@@ -42,13 +42,19 @@ export default function LoginPage() {
             collegeName: formData.role === 'ADMIN' ? formData.collegeName : null,
             role: formData.role 
         });
-        login({ name: formData.name, role: res.data.role, id: res.data.userId }, res.data.token);
-        toast.success('Account created successfully!');
-        const regDashPath = res.data.role === 'ROLE_MASTER_ADMIN' ? '/master-admin/dashboard' : res.data.role === 'ROLE_ADMIN' ? '/admin/dashboard' : '/student/dashboard';
-        navigate(regDashPath);
+        if (res.data.role === 'ROLE_PENDING_ADMIN') {
+          toast.success('Registration successful! Your request has been sent to Master Admin for approval.');
+          setIsLogin(true);
+          setFormData({ ...formData, password: '' });
+        } else {
+          login({ name: formData.name, role: res.data.role, id: res.data.userId }, res.data.token);
+          toast.success('Account created successfully!');
+          const regDashPath = res.data.role === 'ROLE_MASTER_ADMIN' ? '/master-admin/dashboard' : res.data.role === 'ROLE_ADMIN' ? '/admin/dashboard' : '/student/dashboard';
+          navigate(regDashPath);
+        }
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Authentication failed');
+      toast.error(err.response?.data?.message || err.response?.data?.error || 'Authentication failed');
     } finally {
       setLoading(false);
     }
@@ -59,13 +65,47 @@ export default function LoginPage() {
        {/* Background Blurs */}
        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/10 blur-[100px] -z-10 rounded-full" />
 
-      <div className="w-full max-w-md glass p-8 rounded-3xl border border-white/10 shadow-2xl animate-float">
+      <div className="w-full max-w-5xl flex flex-col md:flex-row items-center justify-center gap-12">
+        {/* Inspiration Section */}
+        <div className="flex-1 text-center md:text-left hidden md:block">
+          <h1 className="text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
+            Ignite Your <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
+              True Potential
+            </span>
+          </h1>
+          <p className="text-lg text-slate-300 mb-8 leading-relaxed max-w-lg">
+            "The future belongs to those who learn more skills and combine them in creative ways. Discover amazing events, build your network, and shape your own destiny."
+          </p>
+          <div className="flex items-center justify-center md:justify-start gap-6 text-sm font-medium text-slate-400">
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-lg shadow-indigo-500/10">
+                <Zap size={20} />
+              </div>
+              <span>Inspire</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 shadow-lg shadow-purple-500/10">
+                <School size={20} />
+              </div>
+              <span>Learn</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 shadow-lg shadow-blue-500/10">
+                <User size={20} />
+              </div>
+              <span>Connect</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="w-full max-w-md glass p-8 rounded-3xl border border-white/10 shadow-2xl ">
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/30 mb-4">
             <Zap className="text-white" size={32} />
           </div>
           <h2 className="text-3xl font-bold text-white mb-2">
-            {isLogin ? 'Welcome Back' : 'Join EventHub'}
+            {isLogin ? 'Welcome Back' : 'Join NexusEvents'}
           </h2>
           <p className="text-slate-400">
             {isLogin ? 'Sign in to access your dashboard' : 'Create an account to start exploring events'}
@@ -143,7 +183,7 @@ export default function LoginPage() {
           )}
 
           {!isLogin && formData.role === 'ADMIN' && (
-            <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="space-y-2 ">
               <label className="text-sm font-medium text-slate-300 ml-1">College Name</label>
               <div className="glass-input-group relative">
                 <School className="icon-left" size={18} />
@@ -166,7 +206,7 @@ export default function LoginPage() {
             className="w-full btn-primary py-4 flex items-center justify-center gap-2 mt-4"
           >
             {loading ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full " />
             ) : (
               <>
                 {isLogin ? 'Sign In' : 'Create Account'}
@@ -184,6 +224,7 @@ export default function LoginPage() {
             {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Sign In"}
           </button>
         </div>
+      </div>
       </div>
     </div>
   );

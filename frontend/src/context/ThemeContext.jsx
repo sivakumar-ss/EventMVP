@@ -9,21 +9,23 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     const stored = localStorage.getItem('theme');
-    if (stored) setDark(stored === 'dark');
+    const isDark = stored ? stored === 'dark' : true;
+    setDark(isDark);
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
   }, []);
 
   const toggleTheme = () => {
     setDark(prev => {
-      localStorage.setItem('theme', !prev ? 'dark' : 'light');
+      const nextTheme = !prev ? 'dark' : 'light';
+      localStorage.setItem('theme', nextTheme);
+      document.documentElement.setAttribute('data-theme', nextTheme);
       return !prev;
     });
   };
 
   return (
     <ThemeContext.Provider value={{ dark, toggleTheme }}>
-      <div className={dark ? 'dark' : ''} style={{ minHeight: '100vh' }}>
-        {children}
-      </div>
+      {children}
     </ThemeContext.Provider>
   );
 }

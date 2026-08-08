@@ -230,7 +230,7 @@ function EditEventModal({ event, onClose, onSaved }) {
               className="btn-primary flex items-center gap-2 min-w-[140px] justify-center"
             >
               {loading
-                ? <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                ? <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full " />
                 : <><Save size={16} /> Save Changes</>
               }
             </button>
@@ -306,7 +306,7 @@ export default function ManageEvents() {
           {loading ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-80 glass rounded-3xl animate-pulse bg-white/5" />
+                <div key={i} className="h-80 glass rounded-3xl bg-white/5" />
               ))}
             </div>
           ) : (

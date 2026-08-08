@@ -23,6 +23,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+    private final AdminVerificationService adminVerificationService;
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -30,10 +31,14 @@ public class AuthService {
         }
 
         Role role = Role.ROLE_STUDENT;
+        boolean requestedAdmin = false;
         if ("ADMIN".equalsIgnoreCase(request.getRole()) || "ROLE_ADMIN".equalsIgnoreCase(request.getRole())) {
-            role = Role.ROLE_ADMIN;
+            requestedAdmin = true;
         }
-        // MASTER_ADMIN cannot be self-registered — only seeded via database
+
+        if (requestedAdmin && request.getCollegeName() != null && !request.getCollegeName().isEmpty()) {
+            role = Role.ROLE_PENDING_ADMIN;
+        }
 
         User user = User.builder()
                 .name(request.getName())
@@ -44,6 +49,10 @@ public class AuthService {
                 .build();
 
         userRepository.save(user);
+
+        if (requestedAdmin && request.getCollegeName() != null && !request.getCollegeName().isEmpty()) {
+            adminVerificationService.createRequest(user, request.getCollegeName());
+        }
 
         String jwtToken = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
         return new AuthResponse(jwtToken, user.getRole().name(), user.getId());
@@ -56,6 +65,10 @@ public class AuthService {
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getRole() == Role.ROLE_PENDING_ADMIN) {
+            throw new RuntimeException("Your admin account is pending approval from Master Admin.");
+        }
 
         String jwtToken = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
         return new AuthResponse(jwtToken, user.getRole().name(), user.getId());
