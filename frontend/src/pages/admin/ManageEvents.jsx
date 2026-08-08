@@ -273,6 +273,17 @@ export default function ManageEvents() {
     }
   };
 
+  const handleDeleteEvent = async (id) => {
+    if (!window.confirm('Are you ABSOLUTELY sure you want to delete this event? This will also delete all registrations associated with it.')) return;
+    try {
+      await adminApi.deleteEvent(id);
+      toast.success('Event deleted successfully');
+      fetchEvents();
+    } catch (err) {
+      toast.error('Failed to delete event');
+    }
+  };
+
   const filteredEvents = events.filter(e =>
     e.title.toLowerCase().includes(search.toLowerCase())
   );
@@ -317,7 +328,7 @@ export default function ManageEvents() {
                     event={event}
                     isAdmin={true}
                     onEdit={(e) => setEditingEvent(e)}
-                    onDelete={(e) => toast.error('Deletion is limited for data safety.')}
+                    onDelete={(e) => handleDeleteEvent(e.id)}
                   />
 
                   {/* Admin Overlay Actions */}

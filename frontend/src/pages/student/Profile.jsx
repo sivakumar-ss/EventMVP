@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import Sidebar from '../../components/Sidebar';
 import { User, Mail, School, Camera, Save, Shield, Trophy, Users, UserPlus } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { studentApi } from '../../services/api';
+import { studentApi, networkApi } from '../../services/api';
 
 export default function StudentProfile() {
   const { user } = useAuth();
@@ -21,7 +21,7 @@ export default function StudentProfile() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await studentApi.getNetworkSummary();
+        const res = await networkApi.getSummary();
         setStats({
           score: res.data.score || 0,
           followersCount: res.data.followersCount || 0,

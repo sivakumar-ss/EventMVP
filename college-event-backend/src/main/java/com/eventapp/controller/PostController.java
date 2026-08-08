@@ -44,4 +44,28 @@ public class PostController {
         String email = authentication.getName();
         return ResponseEntity.ok(postService.updatePost(postId, email, content, image));
     }
+
+    @PostMapping("/{postId}/like")
+    public ResponseEntity<PostDto> toggleLike(@PathVariable Long postId, Authentication authentication) {
+        String email = authentication.getName();
+        return ResponseEntity.ok(postService.toggleLike(postId, email));
+    }
+
+    @PostMapping("/{postId}/comments")
+    public ResponseEntity<PostDto> addComment(
+            @PathVariable Long postId,
+            @RequestBody java.util.Map<String, String> payload,
+            Authentication authentication
+    ) {
+        String email = authentication.getName();
+        String content = payload.get("content");
+        return ResponseEntity.ok(postService.addComment(postId, email, content));
+    }
+
+    @DeleteMapping("/comments/{commentId}")
+    public ResponseEntity<Void> deleteComment(@PathVariable Long commentId, Authentication authentication) {
+        String email = authentication.getName();
+        postService.deleteComment(commentId, email);
+        return ResponseEntity.ok().build();
+    }
 }

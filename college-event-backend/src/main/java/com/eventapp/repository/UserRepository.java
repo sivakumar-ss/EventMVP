@@ -24,6 +24,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
            "OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(u.collegeName) LIKE LOWER(CONCAT('%', :search, '%')))")
     List<User> searchOtherStudents(@Param("role") Role role, @Param("userId") Long userId, @Param("search") String search);
 
+    @Query("SELECT u FROM User u WHERE u.role = :role AND " +
+           "(:search IS NULL OR :search = '' OR LOWER(u.collegeName) LIKE LOWER(CONCAT('%', :search, '%')) " +
+           "OR LOWER(u.name) LIKE LOWER(CONCAT('%', :search, '%')))")
+    List<User> searchColleges(@Param("role") Role role, @Param("search") String search);
+
     /** Remove all rows in user_follows where this user is the follower (they follow others) */
     @Modifying
     @Query(value = "DELETE FROM user_follows WHERE follower_id = :userId", nativeQuery = true)

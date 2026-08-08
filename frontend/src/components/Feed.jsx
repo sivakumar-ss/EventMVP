@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { postApi } from '../services/api';
-import { Image as ImageIcon, Send, MessageSquare, Edit2, X, Save } from 'lucide-react';
+import { Image as ImageIcon, Send, MessageSquare, Edit2, X, Save, Heart, Share2, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 
@@ -20,6 +20,19 @@ export default function Feed() {
   const [editImage, setEditImage] = useState(null);
   const [editImagePreview, setEditImagePreview] = useState(null);
   const editFileInputRef = useRef(null);
+
+  const [activeCommentPostId, setActiveCommentPostId] = useState(null);
+  const [commentText, setCommentText] = useState('');
+  const [isCommenting, setIsCommenting] = useState(false);
+  const [expandedCommentIds, setExpandedCommentIds] = useState([]);
+
+  const toggleCommentsList = (postId) => {
+    if (expandedCommentIds.includes(postId)) {
+      setExpandedCommentIds(prev => prev.filter(id => id !== postId));
+    } else {
+      setExpandedCommentIds(prev => [...prev, postId]);
+    }
+  };
 
   const fetchFeed = async () => {
     try {
@@ -119,6 +132,69 @@ export default function Feed() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleToggleLike = async (postId) => {
+    // Optimistic UI update
+    setPosts(prevPosts => prevPosts.map(p => {
+      if (p.id === postId) {
+        return {
+          ...p,
+          isLikedByCurrentUser: !p.isLikedByCurrentUser,
+          likeCount: p.isLikedByCurrentUser ? p.likeCount - 1 : p.likeCount + 1
+        };
+      }
+      return p;
+    }));
+
+    try {
+      await postApi.toggleLike(postId);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to toggle like');
+      // Revert optimism by fetching feed
+      fetchFeed();
+    }
+  };
+
+  const handleAddComment = async (postId) => {
+    if (!commentText.trim()) return;
+    try {
+      setIsCommenting(true);
+      const res = await postApi.addComment(postId, commentText.trim());
+      setPosts(prevPosts => prevPosts.map(p => p.id === postId ? res.data : p));
+      setCommentText('');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to add comment');
+    } finally {
+      setIsCommenting(false);
+    }
+  };
+
+  const handleDeleteComment = async (postId, commentId) => {
+    try {
+      await postApi.deleteComment(commentId);
+      setPosts(prevPosts => prevPosts.map(p => {
+        if (p.id === postId) {
+          return {
+            ...p,
+            comments: p.comments.filter(c => c.id !== commentId)
+          };
+        }
+        return p;
+      }));
+      toast.success('Comment deleted');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to delete comment');
+    }
+  };
+
+  const handleShare = (post) => {
+    const text = encodeURIComponent(`Check out this update from ${post.authorName} on our Campus Network:\n\n"${post.content}"`);
+    const shareUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${text}`;
+    window.open(shareUrl, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -276,6 +352,102 @@ export default function Feed() {
                   {post.imageUrl && (
                     <div className="rounded-2xl overflow-hidden border border-white/10 mb-4">
                       <img src={post.imageUrl} alt="Post attachment" className="w-full h-auto object-cover max-h-[500px]" />
+                    </div>
+                  )}
+
+                  {/* Social Actions */}
+                  <div className="flex items-center gap-6 pt-4 border-t border-white/5">
+                    <button 
+                      onClick={() => handleToggleLike(post.id)}
+                      className={`flex items-center gap-2 text-sm font-medium transition-colors ${post.isLikedByCurrentUser ? 'text-rose-500' : 'text-slate-400 hover:text-white'}`}
+                    >
+                      <Heart size={18} className={post.isLikedByCurrentUser ? 'fill-current' : ''} />
+                      <span>{post.likeCount || 0}</span>
+                    </button>
+                    <button 
+                      onClick={() => setActiveCommentPostId(activeCommentPostId === post.id ? null : post.id)}
+                      className={`flex items-center gap-2 text-sm font-medium transition-colors ${activeCommentPostId === post.id ? 'text-indigo-400' : 'text-slate-400 hover:text-white'}`}
+                    >
+                      <MessageSquare size={18} className={activeCommentPostId === post.id ? 'fill-current opacity-20' : ''} />
+                      <span>{post.comments?.length || 0}</span>
+                    </button>
+                    <button 
+                      onClick={() => handleShare(post)}
+                      className="flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-indigo-400 transition-colors ml-auto"
+                    >
+                      <Share2 size={18} />
+                      <span className="hidden sm:inline">Share</span>
+                    </button>
+                  </div>
+
+                  {/* Comments Section */}
+                  {activeCommentPostId === post.id && (
+                    <div className="mt-4 pt-4 border-t border-white/5 space-y-4">
+                      <div className="flex gap-3">
+                        <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold text-xs shrink-0">
+                          {user?.name?.[0]?.toUpperCase()}
+                        </div>
+                        <div className="flex-1 flex gap-2">
+                          <input 
+                            type="text" 
+                            value={commentText}
+                            onChange={(e) => setCommentText(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') handleAddComment(post.id) }}
+                            placeholder="Add a comment..."
+                            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500"
+                          />
+                          <button 
+                            onClick={() => handleAddComment(post.id)}
+                            disabled={isCommenting || !commentText.trim()}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white p-2 rounded-xl disabled:opacity-50 transition-colors"
+                          >
+                            <Send size={16} />
+                          </button>
+                        </div>
+                      </div>
+
+                      {post.comments?.length > 0 && (
+                        !expandedCommentIds.includes(post.id) ? (
+                          <button 
+                            onClick={() => toggleCommentsList(post.id)} 
+                            className="text-sm text-slate-400 hover:text-white mt-3 font-medium transition-colors"
+                          >
+                            View all {post.comments.length} comments
+                          </button>
+                        ) : (
+                          <div className="space-y-3 mt-4">
+                            <button 
+                              onClick={() => toggleCommentsList(post.id)} 
+                              className="text-sm text-slate-400 hover:text-white mb-2 font-medium transition-colors"
+                            >
+                              Hide comments
+                            </button>
+                            {post.comments.map(comment => (
+                              <div key={comment.id} className="flex gap-3 group">
+                                <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 font-bold text-xs shrink-0">
+                                  {comment.authorName?.[0]?.toUpperCase()}
+                                </div>
+                                <div className="flex-1 bg-white/5 rounded-2xl rounded-tl-none px-4 py-3 relative">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <span className="font-bold text-white text-sm">{comment.authorName}</span>
+                                    <span className="text-[10px] text-slate-500">{comment.createdAt}</span>
+                                  </div>
+                                  <p className="text-slate-300 text-sm whitespace-pre-wrap">{comment.content}</p>
+                                  
+                                  {user?.id === comment.authorId && (
+                                    <button 
+                                      onClick={() => handleDeleteComment(post.id, comment.id)}
+                                      className="absolute top-2 right-2 text-slate-500 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                      <Trash2 size={14} />
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )
+                      )}
                     </div>
                   )}
                 </>

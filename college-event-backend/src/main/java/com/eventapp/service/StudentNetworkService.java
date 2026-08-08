@@ -65,6 +65,14 @@ public class StudentNetworkService {
                 .collect(Collectors.toList());
     }
 
+    public List<StudentNetworkResponse> searchColleges(String currentEmail, String search) {
+        User currentUser = getUserByEmail(currentEmail);
+        List<User> colleges = userRepository.searchColleges(Role.ROLE_ADMIN, search);
+        return colleges.stream()
+                .map(u -> toResponse(u, currentUser))
+                .collect(Collectors.toList());
+    }
+
     public void follow(String currentEmail, Long targetId) {
         User currentUser = getUserByEmail(currentEmail);
         User targetUser = userRepository.findById(targetId)
@@ -98,6 +106,15 @@ public class StudentNetworkService {
     public List<StudentNetworkResponse> getFollowing(String currentEmail) {
         User currentUser = getUserByEmail(currentEmail);
         return currentUser.getFollowing().stream()
+                .filter(u -> u.getRole() == Role.ROLE_STUDENT)
+                .map(u -> toResponse(u, currentUser))
+                .collect(Collectors.toList());
+    }
+
+    public List<StudentNetworkResponse> getFollowingColleges(String currentEmail) {
+        User currentUser = getUserByEmail(currentEmail);
+        return currentUser.getFollowing().stream()
+                .filter(u -> u.getRole() == Role.ROLE_ADMIN)
                 .map(u -> toResponse(u, currentUser))
                 .collect(Collectors.toList());
     }

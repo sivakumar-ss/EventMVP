@@ -77,6 +77,13 @@ public class AdminController {
         return ResponseEntity.ok(eventService.closeEvent(eventId, adminEmail));
     }
 
+    @DeleteMapping("/events/{eventId}")
+    public ResponseEntity<String> deleteEvent(@PathVariable Long eventId, Authentication authentication) {
+        String adminEmail = authentication.getName();
+        eventService.deleteEvent(eventId, adminEmail);
+        return ResponseEntity.ok("Event deleted successfully");
+    }
+
     @PutMapping("/registrations/{registrationId}/verify")
     public ResponseEntity<String> verifyRegistration(
             @PathVariable Long registrationId,

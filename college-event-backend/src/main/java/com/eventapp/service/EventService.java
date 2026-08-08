@@ -65,6 +65,17 @@ public class EventService {
                 .build();
 
         Event savedEvent = eventRepository.save(event);
+
+        // Notify followers
+        for (User follower : admin.getFollowers()) {
+            notificationService.createNotification(
+                    follower,
+                    (admin.getCollegeName() != null ? admin.getCollegeName() : admin.getName()) 
+                    + " just announced a new event: " + savedEvent.getTitle() + "!",
+                    "INFO"
+            );
+        }
+
         return mapToResponse(savedEvent);
     }
 
@@ -325,6 +336,21 @@ public class EventService {
         event.setStatus(EventStatus.CLOSED);
         eventRepository.save(event);
         return mapToResponse(event);
+    }
+
+    public void deleteEvent(Long eventId, String adminEmail) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
+                
+        if (!event.getAdmin().getEmail().equals(adminEmail)) {
+            throw new RuntimeException("Not authorized to delete this event");
+        }
+        
+        // Delete all registrations for this event first
+        List<Registration> registrations = registrationRepository.findByEvent(event);
+        registrationRepository.deleteAll(registrations);
+
+        eventRepository.delete(event);
     }
 
     public ReportResponse getAdminReports(String adminEmail) {

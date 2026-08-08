@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { useWebPush } from './hooks/useWebPush';
 import Navbar from './components/Navbar';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
@@ -47,6 +48,9 @@ const AdminRoute = ({ children }) => {
 };
 
 function AppContent() {
+  const { user } = useAuth();
+  useWebPush(user);
+
   return (
     <div className="min-h-screen bg-slate-950 text-white selection:bg-indigo-500/30">
       <Navbar />

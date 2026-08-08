@@ -49,13 +49,17 @@ export const postApi = {
       'Content-Type': 'multipart/form-data'
     }
   }),
-  getFeed: () => api.get('/student/posts/feed')
+  getFeed: () => api.get('/student/posts/feed'),
+  toggleLike: (id) => api.post(`/student/posts/${id}/like`),
+  addComment: (id, content) => api.post(`/student/posts/${id}/comments`, { content }),
+  deleteComment: (commentId) => api.delete(`/student/posts/comments/${commentId}`)
 };
 
 export const adminApi = {
   createEvent: (eventData) => api.post('/admin/events', eventData),
   updateEvent: (id, eventData) => api.put(`/admin/events/${id}`, eventData),
   getAdminEvents: () => api.get('/admin/events'),
+  deleteEvent: (id) => api.delete(`/admin/events/${id}`),
   closeEvent: (id) => api.put(`/admin/events/${id}/close`),
   getParticipants: (id) => api.get(`/admin/events/${id}/participants`),
   exportCsv: (id) => api.get(`/admin/events/${id}/participants/export`, { responseType: 'blob' }),
@@ -81,16 +85,21 @@ export const masterAdminApi = {
   rejectAdminRequest: (id) => api.put(`/master-admin/admin-requests/${id}/reject`),
 };
 
-export const studentApi = {
-  getEvents: () => api.get('/student/events'),
-  registerForEvent: (eventId, paymentDetails) => api.post(`/student/events/${eventId}/register`, paymentDetails),
-  getRegistrations: () => api.get('/student/registrations'),
-  getNetworkSummary: () => api.get('/student/network/summary'),
-  getStudentsList: (search = '') => api.get(`/student/network/students?search=${search}`),
+export const networkApi = {
+  searchStudents: (search = '') => api.get(`/student/network/students?search=${search}`),
+  searchColleges: (search = '') => api.get(`/student/network/colleges?search=${search}`),
   followStudent: (id) => api.post(`/student/network/follow/${id}`),
   unfollowStudent: (id) => api.post(`/student/network/unfollow/${id}`),
   getFollowers: () => api.get('/student/network/followers'),
   getFollowing: () => api.get('/student/network/following'),
+  getFollowingColleges: () => api.get('/student/network/colleges/following'),
+  getSummary: () => api.get('/student/network/summary'),
+};
+
+export const studentApi = {
+  getEvents: () => api.get('/student/events'),
+  registerForEvent: (eventId, paymentDetails) => api.post(`/student/events/${eventId}/register`, paymentDetails),
+  getRegistrations: () => api.get('/student/registrations'),
   claimCertificate: (registrationId) => api.post(`/student/registrations/${registrationId}/claim-certificate`, {}, { responseType: 'blob' }),
   requestAdminRole: (payload) => api.post('/student/request-admin', payload),
   getAdminRequestStatus: () => api.get('/student/admin-request-status'),
@@ -100,6 +109,7 @@ export const notificationApi = {
   getNotifications: () => api.get('/notifications'),
   markAsRead: (id) => api.put(`/notifications/${id}/read`),
   markAllAsRead: () => api.put('/notifications/read-all'),
+  subscribePush: (subscriptionData) => api.post('/notifications/subscribe', subscriptionData)
 };
 
 export default api;

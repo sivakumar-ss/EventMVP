@@ -52,6 +52,14 @@ public class StudentController {
         return ResponseEntity.ok(studentNetworkService.searchStudents(currentEmail, search));
     }
 
+    @GetMapping("/network/colleges")
+    public ResponseEntity<List<StudentNetworkResponse>> searchColleges(
+            @RequestParam(required = false, defaultValue = "") String search,
+            Authentication authentication) {
+        String currentEmail = authentication.getName();
+        return ResponseEntity.ok(studentNetworkService.searchColleges(currentEmail, search));
+    }
+
     @PostMapping("/network/follow/{userId}")
     public ResponseEntity<String> followStudent(
             @PathVariable Long userId,
@@ -80,6 +88,12 @@ public class StudentController {
     public ResponseEntity<List<StudentNetworkResponse>> getFollowing(Authentication authentication) {
         String currentEmail = authentication.getName();
         return ResponseEntity.ok(studentNetworkService.getFollowing(currentEmail));
+    }
+
+    @GetMapping("/network/colleges/following")
+    public ResponseEntity<List<StudentNetworkResponse>> getFollowingColleges(Authentication authentication) {
+        String currentEmail = authentication.getName();
+        return ResponseEntity.ok(studentNetworkService.getFollowingColleges(currentEmail));
     }
 
     @GetMapping("/network/summary")

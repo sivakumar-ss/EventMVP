@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import Sidebar from '../../components/Sidebar';
-import { studentApi } from '../../services/api';
+import { studentApi, networkApi } from '../../services/api';
 import { Search, UserPlus, UserMinus, Users, CheckCircle, Zap, Shield, SearchCode, Trophy } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function StudentNetwork() {
-  const [activeTab, setActiveTab] = useState('explore'); // explore, followers, following, leaderboard
+  const [activeTab, setActiveTab] = useState('explore'); // explore, followers, following, leaderboard, colleges
   const [students, setStudents] = useState([]);
+  const [colleges, setColleges] = useState([]);
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [summary, setSummary] = useState({ followersCount: 0, followingCount: 0, score: 0 });
@@ -16,17 +17,20 @@ export default function StudentNetwork() {
   const fetchSummaryAndData = async () => {
     try {
       setLoading(true);
-      const summaryRes = await studentApi.getNetworkSummary();
+      const summaryRes = await networkApi.getSummary();
       setSummary(summaryRes.data);
 
       if (activeTab === 'explore') {
-        const studentsRes = await studentApi.getStudentsList(searchQuery);
+        const studentsRes = await networkApi.searchStudents(searchQuery);
         setStudents(studentsRes.data);
+      } else if (activeTab === 'colleges') {
+        const collegesRes = await networkApi.searchColleges(searchQuery);
+        setColleges(collegesRes.data);
       } else if (activeTab === 'followers') {
-        const followersRes = await studentApi.getFollowers();
+        const followersRes = await networkApi.getFollowers();
         setFollowers(followersRes.data);
       } else if (activeTab === 'following' || activeTab === 'leaderboard') {
-        const followingRes = await studentApi.getFollowing();
+        const followingRes = await networkApi.getFollowing();
         setFollowing(followingRes.data);
       }
     } catch (err) {
@@ -51,6 +55,9 @@ export default function StudentNetwork() {
     setStudents(prev =>
       prev.map(s => s.id === id ? { ...s, isFollowing: nowFollowing } : s)
     );
+    setColleges(prev =>
+      prev.map(s => s.id === id ? { ...s, isFollowing: nowFollowing } : s)
+    );
     setFollowers(prev =>
       prev.map(s => s.id === id ? { ...s, isFollowing: nowFollowing } : s)
     );
@@ -63,7 +70,7 @@ export default function StudentNetwork() {
   const handleFollow = async (id, name) => {
     toggleFollowingLocally(id, true); // instant UI update
     try {
-      await studentApi.followStudent(id);
+      await networkApi.followStudent(id);
       toast.success(`You are now following ${name}!`);
       fetchSummaryAndData(); // sync counts in background
     } catch (err) {
@@ -76,7 +83,7 @@ export default function StudentNetwork() {
   const handleUnfollow = async (id, name) => {
     toggleFollowingLocally(id, false); // instant UI update
     try {
-      await studentApi.unfollowStudent(id);
+      await networkApi.unfollowStudent(id);
       toast.success(`You unfollowed ${name}`);
       fetchSummaryAndData(); // sync counts in background
     } catch (err) {
@@ -164,6 +171,17 @@ export default function StudentNetwork() {
               )}
             </button>
             <button
+              onClick={() => setActiveTab('colleges')}
+              className={`pb-4 text-sm font-bold tracking-wide transition-all relative whitespace-nowrap ${
+                activeTab === 'colleges' ? 'text-white' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Colleges
+              {activeTab === 'colleges' && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full" />
+              )}
+            </button>
+            <button
               onClick={() => setActiveTab('following')}
               className={`pb-4 text-sm font-bold tracking-wide transition-all relative whitespace-nowrap ${
                 activeTab === 'following' ? 'text-white' : 'text-slate-400 hover:text-white'
@@ -198,14 +216,14 @@ export default function StudentNetwork() {
             </button>
           </div>
 
-          {/* Search box for Explore tab */}
-          {activeTab === 'explore' && (
+          {/* Search box for Explore/Colleges tab */}
+          {(activeTab === 'explore' || activeTab === 'colleges') && (
             <form onSubmit={handleSearchSubmit} className="mb-8 max-w-md">
               <div className="glass-input-group relative">
                 <Search className="icon-left" size={18} />
                 <input
                   type="text"
-                  placeholder="Search by name, college, or email..."
+                  placeholder={activeTab === 'explore' ? "Search by name, college, or email..." : "Search by college name..."}
                   className="input-field input-with-icon"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -297,6 +315,58 @@ export default function StudentNetwork() {
                           className="w-full py-2.5 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 text-xs font-bold transition-all flex items-center justify-center gap-1.5"
                         >
                           <UserPlus size={14} /> Follow
+                        </button>
+                      )}
+                    </div>
+                  ))}
+
+                {activeTab === 'colleges' &&
+                  colleges.map((college) => (
+                    <div
+                      key={college.id}
+                      className="glass rounded-3xl p-6 border border-white/10 flex flex-col justify-between hover:border-indigo-400 transition-all "
+                    >
+                      <div>
+                        <div className="flex items-start gap-4 mb-4">
+                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white font-extrabold text-lg shadow-lg shadow-indigo-600/20">
+                            {(college.collegeName?.[0] || college.name?.[0])?.toUpperCase()}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-base font-bold text-white truncate">{college.collegeName || college.name}</h4>
+                            <p className="text-slate-400 text-xs truncate mt-0.5">{college.email}</p>
+                          </div>
+                        </div>
+
+                        {/* Network Stats */}
+                        <div className="flex gap-4 py-3 border-y border-white/10 my-4">
+                          <div className="text-center flex-1">
+                            <p className="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Followers</p>
+                            <p className="text-sm font-extrabold text-white mt-0.5">{college.followersCount}</p>
+                          </div>
+                          <div className="w-[1px] bg-white/10" />
+                          <div className="text-center flex-1">
+                            <p className="text-indigo-600 text-[10px] uppercase font-bold tracking-wider">Following</p>
+                            <p className="text-sm font-extrabold text-indigo-600 mt-0.5">{college.followingCount}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {college.isFollowing ? (
+                        <button
+                          onClick={() => handleUnfollow(college.id, college.collegeName || college.name)}
+                          className="w-full py-2.5 rounded-xl border border-emerald-500 text-emerald-600 bg-emerald-50 hover:bg-red-50 hover:border-red-400 hover:text-red-500 text-xs font-bold transition-all flex items-center justify-center gap-1.5 group/btn"
+                        >
+                          <CheckCircle size={14} className="group-hover/btn:hidden" />
+                          <UserMinus size={14} className="hidden group-hover/btn:inline" />
+                          <span className="group-hover/btn:hidden">Following</span>
+                          <span className="hidden group-hover/btn:inline">Unfollow</span>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleFollow(college.id, college.collegeName || college.name)}
+                          className="w-full py-2.5 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                        >
+                          <UserPlus size={14} /> Follow College
                         </button>
                       )}
                     </div>
@@ -483,6 +553,16 @@ export default function StudentNetwork() {
                   <h4 className="text-white font-bold mb-2">No Students Found</h4>
                   <p className="text-slate-400 text-sm">
                     Try searching for something else or check back as more students sign up!
+                  </p>
+                </div>
+              )}
+
+              {activeTab === 'colleges' && colleges.length === 0 && (
+                <div className="glass p-12 text-center rounded-3xl border border-white/5 max-w-md mx-auto">
+                  <SearchCode className="mx-auto text-slate-500 mb-4" size={40} />
+                  <h4 className="text-white font-bold mb-2">No Colleges Found</h4>
+                  <p className="text-slate-400 text-sm">
+                    Try searching for a different college or wait for more colleges to join the platform!
                   </p>
                 </div>
               )}

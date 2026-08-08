@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class NotificationService {
     private final NotificationRepository notificationRepository;
+    private final WebPushService webPushService;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm");
 
     public void createNotification(User user, String message, String type) {
@@ -35,6 +36,13 @@ public class NotificationService {
         System.out.println("Subject: NexusEvents - " + (type.equals("success") ? "Action Successful" : "Notification"));
         System.out.println("Body: Hello " + user.getName() + ",\n\n" + message);
         System.out.println("=====================================================");
+        
+        // Send Web Push Notification
+        try {
+            webPushService.sendPushNotificationToUser(user, "New Notification", message);
+        } catch (Exception e) {
+            System.err.println("Web Push failed: " + e.getMessage());
+        }
     }
 
     public List<NotificationResponse> getUserNotifications(User user) {
