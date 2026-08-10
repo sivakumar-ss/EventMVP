@@ -13,12 +13,19 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // If the API returns HTML (e.g. because of incorrect VITE_API_URL returning index.html), reject it
+    if (typeof response.data === 'string' && response.data.trim().startsWith('<')) {
+      console.error('API returned HTML instead of JSON. Check VITE_API_URL.');
+      return Promise.reject(new Error('Invalid API URL configuration'));
+    }
+    return response;
+  },
   (error) => {
     if (error.response && (error.response.status === 401 || error.response.status === 403)) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      window.location.href = '/student/login';
     }
     return Promise.reject(error);
   }
