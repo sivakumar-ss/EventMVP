@@ -2,8 +2,9 @@
 FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Limit Maven memory usage to prevent OOM on Render
-ENV MAVEN_OPTS="-Xmx256m"
+# Stricter memory limits for build
+ENV JAVA_TOOL_OPTIONS="-Xmx200m -Xss512k -XX:MaxMetaspaceSize=128m"
+ENV MAVEN_OPTS="-Xmx200m"
 
 # Copy pom.xml and download dependencies first (layer caching)
 COPY pom.xml .
@@ -21,4 +22,4 @@ COPY --from=build /app/target/college-event-backend-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-Xmx300m", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Xmx200m", "-Xss512k", "-XX:MaxMetaspaceSize=128m", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
