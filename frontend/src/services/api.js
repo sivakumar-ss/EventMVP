@@ -110,6 +110,7 @@ export const studentApi = {
   claimCertificate: (registrationId) => api.post(`/student/registrations/${registrationId}/claim-certificate`, {}, { responseType: 'blob' }),
   requestAdminRole: (payload) => api.post('/student/request-admin', payload),
   getAdminRequestStatus: () => api.get('/student/admin-request-status'),
+  updateProfile: (profileData) => api.put('/student/profile', profileData),
 };
 
 export const notificationApi = {

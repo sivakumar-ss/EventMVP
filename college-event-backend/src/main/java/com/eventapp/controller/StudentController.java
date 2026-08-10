@@ -129,5 +129,22 @@ public class StudentController {
         AdminRequestResponse status = adminVerificationService.getMyRequestStatus(user);
         return status != null ? ResponseEntity.ok(status) : ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/profile")
+    public ResponseEntity<User> updateProfile(
+            @RequestBody com.eventapp.dto.ProfileUpdateRequest request,
+            Authentication authentication) {
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        if (request.getName() != null && !request.getName().trim().isEmpty()) {
+            user.setName(request.getName());
+        }
+        if (request.getCollegeName() != null && !request.getCollegeName().trim().isEmpty()) {
+            user.setCollegeName(request.getCollegeName());
+        }
+        
+        return ResponseEntity.ok(userRepository.save(user));
+    }
 }
 

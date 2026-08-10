@@ -6,17 +6,18 @@ import toast from 'react-hot-toast';
 import { studentApi, networkApi } from '../../services/api';
 
 export default function StudentProfile() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [profile, setProfile] = useState({
     name: user?.name || '',
     email: user?.email || '',
-    college: 'Government Institute of Technology',
+    college: user?.collegeName || 'Government Institute of Technology',
     dept: 'Computer Science & Engineering',
     year: '3rd Year'
   });
   const [stats, setStats] = useState({ score: 0, followersCount: 0, followingCount: 0 });
   const [adminRequestStatus, setAdminRequestStatus] = useState(null);
   const [isRequestingAdmin, setIsRequestingAdmin] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -47,9 +48,18 @@ export default function StudentProfile() {
     fetchAdminStatus();
   }, []);
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    toast.success('Profile updated successfully!');
+    setIsSaving(true);
+    try {
+      const res = await studentApi.updateProfile({ name: profile.name, collegeName: profile.college });
+      updateUser({ name: res.data.name, collegeName: res.data.collegeName });
+      toast.success('Profile updated successfully!');
+    } catch (err) {
+      toast.error('Failed to update profile');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleRequestAdmin = async () => {
@@ -231,8 +241,8 @@ export default function StudentProfile() {
                         </div>
 
                         <div className="pt-6 border-t border-white/10 flex justify-end">
-                            <button type="submit" className="btn-primary flex items-center gap-2">
-                                <Save size={18} /> Save Changes
+                            <button type="submit" disabled={isSaving} className="btn-primary flex items-center gap-2">
+                                <Save size={18} /> {isSaving ? 'Saving...' : 'Save Changes'}
                             </button>
                         </div>
                     </form>
