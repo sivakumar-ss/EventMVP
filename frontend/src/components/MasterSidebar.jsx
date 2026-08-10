@@ -27,7 +27,7 @@ export default function MasterSidebar() {
   ];
 
   return (
-    <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-slate-950 border-r border-white/5 flex-col z-40 transition-all">
+    <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-slate-950 border-r border-white/5 flex-col z-50 transition-all">
       <div className="h-16 flex items-center px-8 border-b border-white/5">
         <div className="flex items-center gap-2 group">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/20 group-hover:rotate-12 ">
