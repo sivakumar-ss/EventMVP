@@ -8,6 +8,7 @@ services:
   # ── Backend: Spring Boot (Docker) ─────────────────────────────────────────
   - type: web
     name: eventmvp-backend
+    plan: free
     runtime: docker
     rootDir: college-event-backend
     dockerfilePath: ./Dockerfile
