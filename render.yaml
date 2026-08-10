@@ -13,10 +13,18 @@ services:
     rootDir: college-event-backend
     dockerfilePath: ./Dockerfile
     envVars:
-      - key: DATABASE_URL
+      - key: DATABASE_HOST
         fromDatabase:
           name: eventmvp-db
-          property: connectionString
+          property: host
+      - key: DATABASE_PORT
+        fromDatabase:
+          name: eventmvp-db
+          property: port
+      - key: DATABASE_NAME
+        fromDatabase:
+          name: eventmvp-db
+          property: database
       - key: DATABASE_USERNAME
         fromDatabase:
           name: eventmvp-db
