@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import FeedbackForm from './FeedbackForm';
 import FeedbackList from './FeedbackList';
+import { feedbackApi } from '../services/api';
+import toast from 'react-hot-toast';
 
 export default function EventCard({ event, onRegister, registered, isAdmin, onEdit, onDelete }) {
   const [showDetails, setShowDetails] = useState(false);
@@ -240,8 +242,6 @@ function EventFeedbackSection({ eventId }) {
 
   const fetchFeedbacks = async () => {
     try {
-      // Dynamic import to avoid circular dependency if any, or assume it's imported at the top
-      const { feedbackApi } = await import('../services/api');
       const res = await feedbackApi.getEventFeedback(eventId);
       setFeedbacks(res.data);
     } catch (err) {
@@ -254,12 +254,11 @@ function EventFeedbackSection({ eventId }) {
   const handleFeedbackSubmit = async (data) => {
     setSubmitting(true);
     try {
-      const { feedbackApi } = await import('../services/api');
       await feedbackApi.submitEventFeedback(eventId, data);
-      import('react-hot-toast').then(mod => mod.default.success("Feedback submitted successfully!"));
+      toast.success("Feedback submitted successfully!");
       fetchFeedbacks();
     } catch (err) {
-      import('react-hot-toast').then(mod => mod.default.error(err.response?.data?.message || err.response?.data || "Failed to submit feedback"));
+      toast.error(err.response?.data?.message || err.response?.data || "Failed to submit feedback");
     } finally {
       setSubmitting(false);
     }

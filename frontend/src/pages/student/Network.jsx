@@ -640,7 +640,6 @@ function CollegeFeedbackSection({ collegeId }) {
 
   const fetchFeedbacks = async () => {
     try {
-      const { feedbackApi } = await import('../../services/api');
       const res = await feedbackApi.getCollegeFeedback(collegeId);
       setFeedbacks(res.data);
     } catch (err) {
@@ -653,12 +652,11 @@ function CollegeFeedbackSection({ collegeId }) {
   const handleFeedbackSubmit = async (data) => {
     setSubmitting(true);
     try {
-      const { feedbackApi } = await import('../../services/api');
       await feedbackApi.submitCollegeFeedback(collegeId, data);
-      import('react-hot-toast').then(mod => mod.default.success("Feedback submitted successfully!"));
+      toast.success("Feedback submitted successfully!");
       fetchFeedbacks();
     } catch (err) {
-      import('react-hot-toast').then(mod => mod.default.error(err.response?.data?.message || err.response?.data || "Failed to submit feedback"));
+      toast.error(err.response?.data?.message || err.response?.data || "Failed to submit feedback");
     } finally {
       setSubmitting(false);
     }
