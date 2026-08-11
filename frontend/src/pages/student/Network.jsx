@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import Sidebar from '../../components/Sidebar';
-import { studentApi, networkApi } from '../../services/api';
+import { studentApi, networkApi, feedbackApi } from '../../services/api';
 import { Search, UserPlus, UserMinus, Users, CheckCircle, Zap, Shield, SearchCode, Trophy } from 'lucide-react';
 import toast from 'react-hot-toast';
+import FeedbackForm from '../../components/FeedbackForm';
+import FeedbackList from '../../components/FeedbackList';
 
 export default function StudentNetwork() {
   const [activeTab, setActiveTab] = useState('explore'); // explore, followers, following, leaderboard, colleges
@@ -13,6 +15,7 @@ export default function StudentNetwork() {
   const [summary, setSummary] = useState({ followersCount: 0, followingCount: 0, score: 0 });
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [activeFeedbackCollege, setActiveFeedbackCollege] = useState(null);
 
   const fetchSummaryAndData = async () => {
     try {
@@ -352,22 +355,44 @@ export default function StudentNetwork() {
                       </div>
 
                       {college.isFollowing ? (
-                        <button
-                          onClick={() => handleUnfollow(college.id, college.collegeName || college.name)}
-                          className="w-full py-2.5 rounded-xl border border-emerald-500 text-emerald-600 bg-emerald-50 hover:bg-red-50 hover:border-red-400 hover:text-red-500 text-xs font-bold transition-all flex items-center justify-center gap-1.5 group/btn"
-                        >
-                          <CheckCircle size={14} className="group-hover/btn:hidden" />
-                          <UserMinus size={14} className="hidden group-hover/btn:inline" />
-                          <span className="group-hover/btn:hidden">Following</span>
-                          <span className="hidden group-hover/btn:inline">Unfollow</span>
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleUnfollow(college.id, college.collegeName || college.name)}
+                            className="flex-1 py-2.5 rounded-xl border border-emerald-500 text-emerald-600 bg-emerald-50 hover:bg-red-50 hover:border-red-400 hover:text-red-500 text-xs font-bold transition-all flex items-center justify-center gap-1.5 group/btn"
+                          >
+                            <CheckCircle size={14} className="group-hover/btn:hidden" />
+                            <UserMinus size={14} className="hidden group-hover/btn:inline" />
+                            <span className="group-hover/btn:hidden">Following</span>
+                            <span className="hidden group-hover/btn:inline">Unfollow</span>
+                          </button>
+                          <button
+                            onClick={() => setActiveFeedbackCollege(activeFeedbackCollege === college.id ? null : college.id)}
+                            className="flex-1 py-2.5 rounded-xl bg-indigo-600/10 text-indigo-400 hover:bg-indigo-600 hover:text-white text-xs font-bold transition-all"
+                          >
+                            Feedback
+                          </button>
+                        </div>
                       ) : (
-                        <button
-                          onClick={() => handleFollow(college.id, college.collegeName || college.name)}
-                          className="w-full py-2.5 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 text-xs font-bold transition-all flex items-center justify-center gap-1.5"
-                        >
-                          <UserPlus size={14} /> Follow College
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleFollow(college.id, college.collegeName || college.name)}
+                            className="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                          >
+                            <UserPlus size={14} /> Follow College
+                          </button>
+                          <button
+                            onClick={() => setActiveFeedbackCollege(activeFeedbackCollege === college.id ? null : college.id)}
+                            className="flex-1 py-2.5 rounded-xl bg-indigo-600/10 text-indigo-400 hover:bg-indigo-600 hover:text-white text-xs font-bold transition-all"
+                          >
+                            Feedback
+                          </button>
+                        </div>
+                      )}
+                      
+                      {activeFeedbackCollege === college.id && (
+                        <div className="mt-4 pt-4 border-t border-white/10">
+                           <CollegeFeedbackSection collegeId={college.id} />
+                        </div>
                       )}
                     </div>
                   ))}
@@ -600,6 +625,54 @@ export default function StudentNetwork() {
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function CollegeFeedbackSection({ collegeId }) {
+  const [feedbacks, setFeedbacks] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [submitting, setSubmitting] = React.useState(false);
+
+  React.useEffect(() => {
+    fetchFeedbacks();
+  }, [collegeId]);
+
+  const fetchFeedbacks = async () => {
+    try {
+      const { feedbackApi } = await import('../../services/api');
+      const res = await feedbackApi.getCollegeFeedback(collegeId);
+      setFeedbacks(res.data);
+    } catch (err) {
+      console.error("Failed to fetch feedback", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFeedbackSubmit = async (data) => {
+    setSubmitting(true);
+    try {
+      const { feedbackApi } = await import('../../services/api');
+      await feedbackApi.submitCollegeFeedback(collegeId, data);
+      import('react-hot-toast').then(mod => mod.default.success("Feedback submitted successfully!"));
+      fetchFeedbacks();
+    } catch (err) {
+      import('react-hot-toast').then(mod => mod.default.error(err.response?.data?.message || err.response?.data || "Failed to submit feedback"));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div>
+      <h4 className="text-white font-bold mb-4">College Feedback</h4>
+      <FeedbackForm onSubmit={handleFeedbackSubmit} isSubmitting={submitting} />
+      {loading ? (
+        <p className="text-slate-400 text-sm">Loading feedback...</p>
+      ) : (
+        <FeedbackList feedbacks={feedbacks} />
+      )}
     </div>
   );
 }

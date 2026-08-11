@@ -1,7 +1,9 @@
 import { Calendar, MapPin, Users, ArrowRight, CheckCircle, XCircle, School, Banknote, Clock, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import FeedbackForm from './FeedbackForm';
+import FeedbackList from './FeedbackList';
 
 export default function EventCard({ event, onRegister, registered, isAdmin, onEdit, onDelete }) {
   const [showDetails, setShowDetails] = useState(false);
@@ -212,10 +214,65 @@ export default function EventCard({ event, onRegister, registered, isAdmin, onEd
               <h3 className="font-bold text-white mb-2">About This Event</h3>
               <p className="text-slate-400 whitespace-pre-wrap leading-relaxed">{event.description}</p>
             </div>
+            
+            {/* Feedback Section */}
+            <div className="mt-4 pt-6 border-t border-white/10">
+              <h3 className="font-bold text-white mb-4">Event Feedback</h3>
+              <EventFeedbackSection eventId={event.id} />
+            </div>
           </div>
         </div>
       </div>
     )}
     </>
+  );
+}
+
+function EventFeedbackSection({ eventId }) {
+  const [feedbacks, setFeedbacks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  
+  // We need feedbackApi here, so we import it at the top of the file
+  useEffect(() => {
+    fetchFeedbacks();
+  }, [eventId]);
+
+  const fetchFeedbacks = async () => {
+    try {
+      // Dynamic import to avoid circular dependency if any, or assume it's imported at the top
+      const { feedbackApi } = await import('../services/api');
+      const res = await feedbackApi.getEventFeedback(eventId);
+      setFeedbacks(res.data);
+    } catch (err) {
+      console.error("Failed to fetch feedback", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFeedbackSubmit = async (data) => {
+    setSubmitting(true);
+    try {
+      const { feedbackApi } = await import('../services/api');
+      await feedbackApi.submitEventFeedback(eventId, data);
+      import('react-hot-toast').then(mod => mod.default.success("Feedback submitted successfully!"));
+      fetchFeedbacks();
+    } catch (err) {
+      import('react-hot-toast').then(mod => mod.default.error(err.response?.data?.message || err.response?.data || "Failed to submit feedback"));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div>
+      <FeedbackForm onSubmit={handleFeedbackSubmit} isSubmitting={submitting} />
+      {loading ? (
+        <p className="text-slate-400 text-sm">Loading feedback...</p>
+      ) : (
+        <FeedbackList feedbacks={feedbacks} />
+      )}
+    </div>
   );
 }

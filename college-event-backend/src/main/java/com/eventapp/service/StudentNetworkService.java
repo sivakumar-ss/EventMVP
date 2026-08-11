@@ -31,7 +31,7 @@ public class StudentNetworkService {
         List<Registration> regs = registrationRepository.findByStudent(student);
         int score = 0;
         for (Registration reg : regs) {
-            if (reg.getStatus() == RegistrationStatus.VERIFIED && reg.isCertificateClaimed()) {
+            if (reg.getStatus() == RegistrationStatus.VERIFIED && reg.isCertificateGranted()) {
                 if (reg.getEvent() != null && "Technical".equalsIgnoreCase(reg.getEvent().getCategory())) {
                     score += 10;
                 } else {

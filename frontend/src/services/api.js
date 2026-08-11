@@ -120,4 +120,11 @@ export const notificationApi = {
   subscribePush: (subscriptionData) => api.post('/notifications/subscribe', subscriptionData)
 };
 
+export const feedbackApi = {
+  submitEventFeedback: (eventId, data) => api.post(`/student/feedback/event/${eventId}`, data),
+  submitCollegeFeedback: (collegeId, data) => api.post(`/student/feedback/college/${collegeId}`, data),
+  getEventFeedback: (eventId) => api.get(`/public/feedback/event/${eventId}`),
+  getCollegeFeedback: (collegeId) => api.get(`/public/feedback/college/${collegeId}`),
+};
+
 export default api;
