@@ -96,7 +96,7 @@ export default function StudentDashboard() {
     <div className="flex">
       <Sidebar />
       <motion.div 
-        className="flex-1 lg:ml-64 p-6 lg:p-10"
+        className="flex-1 lg:ml-64 p-6 lg:p-10 min-w-0"
         variants={containerVariants}
         initial="hidden"
         animate="visible"

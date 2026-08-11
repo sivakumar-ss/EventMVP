@@ -55,7 +55,7 @@ export default function CreateEvent() {
   return (
     <div className="flex">
       <Sidebar />
-      <div className="flex-1 lg:ml-64 p-6 lg:p-10">
+      <div className="flex-1 lg:ml-64 p-6 lg:p-10 min-w-0">
         <div className="max-w-4xl mx-auto">
           <header className="mb-10 flex items-center justify-between">
             <div>

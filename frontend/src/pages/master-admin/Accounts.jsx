@@ -67,7 +67,7 @@ export default function MasterAccounts() {
   return (
     <div className="flex">
       <MasterSidebar />
-      <div className="flex-1 lg:ml-64 p-6 lg:p-10">
+      <div className="flex-1 lg:ml-64 p-6 lg:p-10 min-w-0">
         <div className="max-w-7xl mx-auto">
           <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>

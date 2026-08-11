@@ -50,7 +50,7 @@ export default function Support() {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <div className="flex-1 lg:ml-64 p-6 lg:p-10">
+      <div className="flex-1 lg:ml-64 p-6 lg:p-10 min-w-0">
         <div className="max-w-5xl mx-auto">
           <header className="mb-10">
             <h1 className="text-4xl font-bold text-white mb-2">Help & <span className="gradient-text">Support</span></h1>
