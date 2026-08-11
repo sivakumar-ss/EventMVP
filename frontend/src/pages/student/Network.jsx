@@ -656,7 +656,8 @@ function CollegeFeedbackSection({ collegeId }) {
       toast.success("Feedback submitted successfully!");
       fetchFeedbacks();
     } catch (err) {
-      toast.error(err.response?.data?.message || err.response?.data || "Failed to submit feedback");
+      const msg = err.response?.data?.message || (typeof err.response?.data === 'string' ? err.response.data : "Failed to submit feedback");
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }
