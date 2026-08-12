@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Zap, Bell, User, LogOut, Search, Menu, CheckCircle, Info, AlertCircle, Moon, Sun } from 'lucide-react';
+import { Zap, Bell, User, LogOut, Search, Menu, X, CheckCircle, Info, AlertCircle, Moon, Sun, LayoutDashboard, Calendar, BookmarkCheck, Settings, ListChecks, BarChart3, PlusCircle, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { notificationApi } from '../services/api';
@@ -15,6 +15,7 @@ export default function Navbar() {
   const location = useLocation();
   const [showProfile, setShowProfile] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [notifications, setNotifications] = useState([]);
   
@@ -245,12 +246,70 @@ export default function Navbar() {
               </div>
             )}
             
-            <button className="md:hidden text-white">
-              <Menu size={24} />
+            <button className="md:hidden text-white" onClick={() => setShowMobileMenu(!showMobileMenu)}>
+              {showMobileMenu ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu Overlay */}
+      {showMobileMenu && (
+        <div className="md:hidden fixed inset-0 top-16 bg-slate-950/95 backdrop-blur-xl z-40 overflow-y-auto">
+          <div className="px-4 py-8 space-y-2">
+            {user ? (
+              <>
+                {(user?.role === 'ROLE_ADMIN' ? [
+                  { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
+                  { icon: PlusCircle, label: 'Create Event', path: '/admin/create-event' },
+                  { icon: ListChecks, label: 'Manage Events', path: '/admin/events' },
+                  { icon: BarChart3, label: 'Reports', path: '/admin/reports' },
+                  { icon: BookmarkCheck, label: 'Support', path: '/admin/support' },
+                ] : [
+                  { icon: LayoutDashboard, label: 'Dashboard', path: '/student/dashboard' },
+                  { icon: Calendar, label: 'Browse Events', path: '/student/events' },
+                  { icon: BookmarkCheck, label: 'My Registrations', path: '/student/my-events' },
+                  { icon: Users, label: 'My Network', path: '/student/network' },
+                  { icon: User, label: 'My Profile', path: '/student/profile' },
+                ]).map((item, index) => (
+                  <Link
+                    key={index}
+                    to={item.path}
+                    onClick={() => setShowMobileMenu(false)}
+                    className="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                  >
+                    <item.icon size={20} className="shrink-0" />
+                    <span className="font-medium">{item.label}</span>
+                  </Link>
+                ))}
+                
+                <div className="pt-4 mt-4 border-t border-white/10">
+                  <Link 
+                    to={user?.role === 'ROLE_ADMIN' ? "/admin/settings" : "/student/profile"}
+                    onClick={() => setShowMobileMenu(false)}
+                    className="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                  >
+                    <Settings size={20} className="shrink-0" />
+                    <span className="font-medium">Settings</span>
+                  </Link>
+                  <button 
+                    onClick={() => { setShowMobileMenu(false); handleLogout(); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 mt-2 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-xl transition-all"
+                  >
+                    <LogOut size={20} />
+                    <span className="font-medium">Sign Out</span>
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="flex flex-col gap-4 p-4">
+                <Link to="/student/login" onClick={() => setShowMobileMenu(false)} className="text-center font-bold text-white py-3 rounded-xl border border-white/20">Sign In</Link>
+                <Link to="/student/login" onClick={() => setShowMobileMenu(false)} className="btn-primary text-center py-3 rounded-xl">Join Now</Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
