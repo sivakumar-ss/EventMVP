@@ -4,11 +4,13 @@ import { Zap, Bell, User, LogOut, Search, Menu, CheckCircle, Info, AlertCircle, 
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { notificationApi } from '../services/api';
+import usePWAInstall from '../hooks/usePWAInstall';
 import toast from 'react-hot-toast';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const { dark, toggleTheme } = useTheme();
+  const { isInstallable, installApp } = usePWAInstall();
   const navigate = useNavigate();
   const location = useLocation();
   const [showProfile, setShowProfile] = useState(false);
@@ -124,6 +126,16 @@ export default function Navbar() {
             >
               {dark ? <Sun size={20} /> : <Moon size={20} />}
             </button>
+
+            {/* Install PWA Button */}
+            {isInstallable && (
+              <button 
+                onClick={installApp}
+                className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-full text-xs font-bold transition-all"
+              >
+                Install App
+              </button>
+            )}
 
             {user ? (
               <>
