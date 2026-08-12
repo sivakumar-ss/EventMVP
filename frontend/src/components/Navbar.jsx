@@ -255,7 +255,7 @@ export default function Navbar() {
 
       {/* Mobile Menu Overlay */}
       {showMobileMenu && (
-        <div className="md:hidden fixed inset-0 top-16 bg-slate-950/95 backdrop-blur-xl z-40 overflow-y-auto">
+        <div className="md:hidden fixed inset-0 top-16 bg-slate-950 z-40 overflow-y-auto border-t border-white/5">
           <div className="px-4 py-8 space-y-2">
             {user ? (
               <>
@@ -276,7 +276,7 @@ export default function Navbar() {
                     key={index}
                     to={item.path}
                     onClick={() => setShowMobileMenu(false)}
-                    className="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                    className="sidebar-link"
                   >
                     <item.icon size={20} className="shrink-0" />
                     <span className="font-medium">{item.label}</span>
@@ -287,7 +287,7 @@ export default function Navbar() {
                   <Link 
                     to={user?.role === 'ROLE_ADMIN' ? "/admin/settings" : "/student/profile"}
                     onClick={() => setShowMobileMenu(false)}
-                    className="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                    className="sidebar-link"
                   >
                     <Settings size={20} className="shrink-0" />
                     <span className="font-medium">Settings</span>
@@ -303,7 +303,7 @@ export default function Navbar() {
               </>
             ) : (
               <div className="flex flex-col gap-4 p-4">
-                <Link to="/student/login" onClick={() => setShowMobileMenu(false)} className="text-center font-bold text-white py-3 rounded-xl border border-white/20">Sign In</Link>
+                <Link to="/student/login" onClick={() => setShowMobileMenu(false)} className="text-center font-bold text-white py-3 rounded-xl border border-white/20 hover:bg-white/5 transition-all">Sign In</Link>
                 <Link to="/student/login" onClick={() => setShowMobileMenu(false)} className="btn-primary text-center py-3 rounded-xl">Join Now</Link>
               </div>
             )}
